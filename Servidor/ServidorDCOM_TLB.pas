@@ -12,7 +12,7 @@ unit ServidorDCOM_TLB;
 // ************************************************************************ //
 
 // $Rev: 122765 $
-// File generated on 3/02/2026 10:14:36 p. m. from Type Library described below.
+// File generated on 5/02/2026 12:06:28 a. m. from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: D:\DigitalWare\Entregables\Servidor\ServidorDCOM (1)
@@ -75,6 +75,12 @@ type
 // *********************************************************************//
   IServidor = interface(IAppServer)
     ['{3FBE46FA-62E0-46F1-A60F-759E205E822D}']
+    function EjecutarSql(const Sql: WideString): Integer; safecall;
+    function EliminarCliente(AIdCliente: Integer): Integer; safecall;
+    function Get_PEstado: WideString; safecall;
+    procedure Set_PEstado(const Value: WideString); safecall;
+    function CrearCliente(const ANombresCliente: WideString; const ADireccion: WideString): Integer; safecall;
+    property PEstado: WideString read Get_PEstado write Set_PEstado;
   end;
 
 // *********************************************************************//
@@ -84,6 +90,10 @@ type
 // *********************************************************************//
   IServidorDisp = dispinterface
     ['{3FBE46FA-62E0-46F1-A60F-759E205E822D}']
+    function EjecutarSql(const Sql: WideString): Integer; dispid 301;
+    function EliminarCliente(AIdCliente: Integer): Integer; dispid 302;
+    property PEstado: WideString dispid 303;
+    function CrearCliente(const ANombresCliente: WideString; const ADireccion: WideString): Integer; dispid 304;
     function AS_ApplyUpdates(const ProviderName: WideString; Delta: OleVariant; MaxErrors: SYSINT;
                              out ErrorCount: SYSINT; var OwnerData: OleVariant): OleVariant; dispid 20000000;
     function AS_GetRecords(const ProviderName: WideString; Count: SYSINT; out RecsOut: SYSINT;

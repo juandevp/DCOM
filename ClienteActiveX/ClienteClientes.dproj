@@ -96,6 +96,10 @@
             <DesignClass>TActiveForm</DesignClass>
             <CoClasses>Cliente</CoClasses>
         </DCCReference>
+        <DCCReference Include="C:\Program Files (x86)\Embarcadero\Studio\37.0\ObjRepos\en\DelphiWin32\Vcl.recerror.pas">
+            <Form>ReconcileErrorForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <RidlCompile Include="ActiveClientes.ridl"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
@@ -119,7 +123,7 @@
                 </Source>
             </Delphi.Personality>
             <Deployment Version="5">
-                <DeployFile LocalName="Win32\Debug\ClienteClientes.dll" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Win32\Debug\ClienteClientes.ocx" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>ClienteClientes.dll</RemoteName>
                         <Overwrite>true</Overwrite>

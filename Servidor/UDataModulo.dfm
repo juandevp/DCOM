@@ -4,27 +4,31 @@ object Servidor: TServidor
   object Conn: TFDConnection
     Params.Strings = (
       'Database=dw'
-      'User_Name=digital'
-      'Password=123456789'
       'OSAuthent=Yes'
       'Server=LAPTOP-K8JF3JJ2'
       'DriverID=MSSQL')
     Connected = True
     LoginPrompt = False
-    Left = 48
+    Left = 56
     Top = 32
+  end
+  object DspClientes: TDataSetProvider
+    DataSet = QClientes
+    ResolveToDataSet = True
+    Options = [poAutoRefresh, poUseQuoteChar]
+    Left = 216
+    Top = 96
   end
   object QClientes: TFDQuery
     Connection = Conn
-    UpdateOptions.AssignedValues = [uvGeneratorName]
-    UpdateOptions.UpdateTableName = 'CLIENTES'
     SQL.Strings = (
-      'select * from clientes')
+      'select * from [DW].[dbo].clientes order by cliente desc')
     Left = 56
-    Top = 104
+    Top = 88
     object QClientesCLIENTE: TFDAutoIncField
       FieldName = 'CLIENTE'
       Origin = 'CLIENTE'
+      ProviderFlags = [pfInWhere, pfInKey]
     end
     object QClientesNOMBRE_CLIENTE: TStringField
       FieldName = 'NOMBRE_CLIENTE'
@@ -37,66 +41,61 @@ object Servidor: TServidor
       Size = 255
     end
   end
-  object DspClientes: TDataSetProvider
-    DataSet = QClientes
-    ResolveToDataSet = True
-    Options = [poAutoRefresh, poUseQuoteChar]
-    BeforeUpdateRecord = DspClientesBeforeUpdateRecord
-    Left = 128
-    Top = 96
-  end
-  object qInsertarCliente: TFDQuery
+  object QValidarFacturasCliente: TFDQuery
     Connection = Conn
     UpdateOptions.AssignedValues = [uvGeneratorName]
     UpdateOptions.UpdateTableName = 'CLIENTES'
     UpdateOptions.KeyFields = 'CLIENTE_ID'
     SQL.Strings = (
-      'INSERT INTO [dbo].[CLIENTES]'
-      '           ([CLIENTE_ID]'
-      '           ,[CLIENTE]'
-      '           ,[NOMBRE_CLIENTE]'
-      '           ,[DIRECCION])'
-      '     VALUES'
-      '           (:NOMBRE_CLIENTE,'
-      '            :DIRECCION)')
-    Left = 64
-    Top = 192
+      
+        'SELECT COUNT(*) As TotalFac FROM CLIENTES C INNER JOIN CABEZA_FA' +
+        'CTURA CF ON  CF.CLIENTE_ID =  C.CLIENTE WHERE C.CLIENTE = :CLIEN' +
+        'TE')
+    Left = 168
+    Top = 144
+    ParamData = <
+      item
+        Name = 'CLIENTE'
+        DataType = ftInteger
+        ParamType = ptInput
+        Size = 1
+        Value = Null
+      end>
+  end
+  object QEliminarCliente: TFDQuery
+    Connection = Conn
+    SQL.Strings = (
+      'DELETE FROM CLIENTES WHERE CLIENTE =:CLIENTE')
+    Left = 56
+    Top = 208
+    ParamData = <
+      item
+        Name = 'CLIENTE'
+        DataType = ftInteger
+        ParamType = ptInput
+        Value = Null
+      end>
+  end
+  object QCrearCliente: TFDQuery
+    Connection = Conn
+    SQL.Strings = (
+      
+        'INSERT INTO CLIENTES (NOMBRE_CLIENTE, DIRECCION) VALUES (:NOMBRE' +
+        '_CLIENTE, :DIRECCION)')
+    Left = 56
+    Top = 144
     ParamData = <
       item
         Name = 'NOMBRE_CLIENTE'
         DataType = ftString
         ParamType = ptInput
-        Size = 50
-        Value = Null
+        Value = 'SDASDASD'
       end
       item
         Name = 'DIRECCION'
         DataType = ftString
         ParamType = ptInput
-        Size = 255
-        Value = Null
+        Value = 'ASDASDASD'
       end>
-    object IntegerField1: TIntegerField
-      FieldName = 'CLIENTE_ID'
-      Origin = 'CLIENTE_ID'
-      ProviderFlags = [pfInKey]
-      ReadOnly = True
-      Required = True
-    end
-    object StringField1: TStringField
-      FieldName = 'CLIENTE'
-      Origin = 'CLIENTE'
-      Size = 50
-    end
-    object StringField2: TStringField
-      FieldName = 'NOMBRE_CLIENTE'
-      Origin = 'NOMBRE_CLIENTE'
-      Size = 100
-    end
-    object StringField3: TStringField
-      FieldName = 'DIRECCION'
-      Origin = 'DIRECCION'
-      Size = 255
-    end
   end
 end

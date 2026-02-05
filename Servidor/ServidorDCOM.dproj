@@ -125,15 +125,14 @@
         </DelphiCompile>
         <DCCReference Include="UForm.pas">
             <Form>FrmApp</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="UDataModulo.pas">
             <Form>Servidor</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TRemoteDataModule</DesignClass>
             <CoClasses>Servidor</CoClasses>
         </DCCReference>
         <DCCReference Include="ServidorDCOM_TLB.pas"/>
+        <DCCReference Include="..\UtilDeplhi\UComun.pas"/>
         <RidlCompile Include="ServidorDCOM.ridl"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

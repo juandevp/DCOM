@@ -8,8 +8,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Controls,
   Vcl.Forms, Vcl.Dialogs, Winapi.ActiveX, Vcl.AxCtrls, ActiveClientes_TLB, StdVcl,
   Data.DB, Datasnap.DBClient, Datasnap.Win.MConnect, Vcl.Grids, Vcl.DBGrids,
-  Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Buttons, Vcl.DBCtrls, Vcl.StdCtrls;
-
+  Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Buttons, Vcl.DBCtrls, Vcl.StdCtrls,Vcl.recerror,
+  Vcl.Mask;
 type
   TCliente = class(TActiveForm, ICliente)
     DCOMConnection: TDCOMConnection;
@@ -17,18 +17,33 @@ type
     pcGeneral: TPageControl;
     TbsClientes: TTabSheet;
     DbClientesLista: TDBGrid;
+    DBNavigator1: TDBNavigator;
+    BtnAgregar: TButton;
     CdsClientes: TClientDataSet;
     CdsClientesCLIENTE: TAutoIncField;
     CdsClientesNOMBRE_CLIENTE: TStringField;
     CdsClientesDIRECCION: TStringField;
-    DBNavigator1: TDBNavigator;
+    BtnEliminar: TButton;
+    PnlFiltrar: TPanel;
+    LblFiltro: TLabel;
+    EdtFiltrar: TEdit;
+    DbEdtNombres: TDBEdit;
+    DbEdtDireccion: TDBEdit;
+    LblNombres: TLabel;
+    LblDireccion: TLabel;
+    procedure ActiveFormCreate(Sender: TObject);
+    procedure CdsClientesReconcileError(DataSet: TCustomClientDataSet;
+      E: EReconcileError; UpdateKind: TUpdateKind;
+      var Action: TReconcileAction);
+    procedure BtnEliminarClick(Sender: TObject);
+    procedure BtnAgregarClick(Sender: TObject);
+    procedure EdtFiltrarChange(Sender: TObject);
   private
     { Private declarations }
     FEvents: IClienteEvents;
     procedure ActivateEvent(Sender: TObject);
     procedure AfterMonitorDpiChangedEvent(Sender: TObject; OldDPI, NewDPI: Integer);
     procedure BeforeMonitorDpiChangedEvent(Sender: TObject; OldDPI, NewDPI: Integer);
-
     procedure ClickEvent(Sender: TObject);
     procedure CreateEvent(Sender: TObject);
     procedure DblClickEvent(Sender: TObject);
@@ -38,6 +53,8 @@ type
     procedure MouseEnterEvent(Sender: TObject);
     procedure MouseLeaveEvent(Sender: TObject);
     procedure PaintEvent(Sender: TObject);
+    procedure InicializarCOM;
+    procedure CargarClientes;
   protected
     { Protected declarations }
     procedure DefinePropertyPages(DefinePropertyPage: TDefinePropertyPage); override;
@@ -116,6 +133,7 @@ type
     procedure Initialize; override;
   end;
 
+
 implementation
 
 uses System.Win.ComObj, System.Win.ComServ;
@@ -129,6 +147,18 @@ begin
   { Define property pages here.  Property pages are defined by calling
     DefinePropertyPage with the class id of the page.  For example,
       DefinePropertyPage(Class_ClientePage); }
+end;
+
+procedure TCliente.EdtFiltrarChange(Sender: TObject);
+var
+  Filtro: string;
+begin
+  CdsClientes.Filtered := False;
+
+  if EdtFiltrar.Text = '' then Exit;
+  Filtro :='NOMBRE_CLIENTE LIKE '+ QuotedStr('%'+EdtFiltrar.Text+'%');
+  CdsClientes.Filter := Filtro;
+  CdsClientes.Filtered := True;
 end;
 
 procedure TCliente.EventSinkChanged(const EventSink: IUnknown);
@@ -364,6 +394,12 @@ begin
   if FEvents <> nil then FEvents.OnActivate;
 end;
 
+procedure TCliente.ActiveFormCreate(Sender: TObject);
+begin
+  InicializarCOM;
+  CargarClientes;
+end;
+
 procedure TCliente.AfterMonitorDpiChangedEvent(Sender: TObject; OldDPI, NewDPI: Integer);
 
 begin
@@ -374,6 +410,38 @@ procedure TCliente.BeforeMonitorDpiChangedEvent(Sender: TObject; OldDPI, NewDPI:
 
 begin
   if FEvents <> nil then FEvents.OnBeforeMonitorDpiChanged(OldDPI, NewDPI);
+end;
+
+procedure TCliente.BtnEliminarClick(Sender: TObject);
+begin
+  ShowMessage(CdsClientesCLIENTE.AsInteger.ToString);
+  DCOMConnection.AppServer.EliminarCliente(CdsClientesCLIENTE.AsInteger);
+  MessageDlg(DCOMConnection.AppServer.PEstado, TMsgDlgType.mtInformation, [TMsgDlgBtn.mbOK], 0);
+  CdsClientes.Refresh;
+end;
+
+procedure TCliente.BtnAgregarClick(Sender: TObject);
+begin
+  if (Trim(DbEdtNombres.Text)='') or  (Trim(DbEdtDireccion.Text)='')  then
+  begin
+     MessageDlg('Por favor, complete todos los campos obligatorios antes de guardar.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+     Exit;
+  end;
+
+  if CdsClientes.State in [dsInsert] then
+  begin
+    BtnAgregar.Caption := 'Crear';
+    DCOMConnection.AppServer.
+      CrearCliente(CdsClientesNOMBRE_CLIENTE.AsString,CdsClientesDIRECCION.AsString);
+    MessageDlg(DCOMConnection.AppServer.PEstado, TMsgDlgType.mtInformation, [TMsgDlgBtn.mbOK], 0);
+    CdsClientes.Close;
+    CdsClientes.Open;
+  end
+  else
+  begin
+    CdsClientes.Insert;
+    BtnAgregar.Caption := 'Guardar';
+  end;
 end;
 
 procedure TCliente.ClickEvent(Sender: TObject);
@@ -423,6 +491,23 @@ end;
 procedure TCliente.PaintEvent(Sender: TObject);
 begin
   if FEvents <> nil then FEvents.OnPaint;
+end;
+
+procedure TCliente.InicializarCOM;
+begin
+  DCOMConnection.Connected := True;
+end;
+
+procedure TCliente.CargarClientes;
+begin
+  CdsClientes.Close;
+  CdsClientes.Open;
+end;
+
+procedure TCliente.CdsClientesReconcileError(DataSet: TCustomClientDataSet;
+  E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
+begin
+  HandleReconcileError(Dataset, UpdateKind, E)
 end;
 
 procedure TCliente.Set_AlignWithMargins(Value: WordBool);

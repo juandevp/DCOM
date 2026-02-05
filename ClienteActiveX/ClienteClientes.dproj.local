@@ -5,12 +5,15 @@
     <Transaction>2026/02/02 22:49:50.000.305,=C:\Users\juanc\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2026/02/03 18:06:15.000.684,=C:\Users\juanc\OneDrive\Documentos\Embarcadero\Studio\Projects\Project1.ridl</Transaction>
     <Transaction>2026/02/03 18:06:15.000.733,=C:\Users\juanc\OneDrive\Documentos\Embarcadero\Studio\Projects\Project1_TLB.pas</Transaction>
+    <Transaction>2026/02/03 18:06:56.000.577,D:\DigitalWare\Entregables\ClienteActiveX\ActiveClientes_TLB.pas=D:\DigitalWare\Entregables\ClienteActiveX\Project1_TLB.pas</Transaction>
     <Transaction>2026/02/03 18:06:56.000.544,D:\DigitalWare\Entregables\ClienteActiveX\ActiveClientes.ridl=C:\Users\juanc\OneDrive\Documentos\Embarcadero\Studio\Projects\Project1.ridl</Transaction>
     <Transaction>2026/02/03 18:06:56.000.573,D:\DigitalWare\Entregables\ClienteActiveX\Project1_TLB.pas=C:\Users\juanc\OneDrive\Documentos\Embarcadero\Studio\Projects\Project1_TLB.pas</Transaction>
-    <Transaction>2026/02/03 18:06:56.000.577,D:\DigitalWare\Entregables\ClienteActiveX\ActiveClientes_TLB.pas=D:\DigitalWare\Entregables\ClienteActiveX\Project1_TLB.pas</Transaction>
     <Transaction>2026/02/03 18:07:09.000.702,D:\DigitalWare\Entregables\ClienteActiveX\ClienteClientes.dproj=C:\Users\juanc\OneDrive\Documentos\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
     <Transaction>2026/02/03 18:07:29.000.357,=D:\DigitalWare\Entregables\ClienteActiveX\Unit1.pas</Transaction>
     <Transaction>2026/02/03 18:07:42.000.693,D:\DigitalWare\Entregables\ClienteActiveX\UClientes.pas=D:\DigitalWare\Entregables\ClienteActiveX\Unit1.pas</Transaction>
     <Transaction>2026/02/03 18:07:42.000.693,D:\DigitalWare\Entregables\ClienteActiveX\UClientes.dfm=D:\DigitalWare\Entregables\ClienteActiveX\Unit1.dfm</Transaction>
+    <Transaction>2026/02/04 19:45:34.000.950,=C:\Program Files (x86)\Embarcadero\Studio\37.0\ObjRepos\en\DelphiWin32\Vcl.recerror.pas</Transaction>
+    <Transaction>2026/02/04 23:04:34.000.950,=D:\DigitalWare\Entregables\Servidor\ServidorDCOM_TLB.pas</Transaction>
+    <Transaction>2026/02/04 23:07:54.000.030,D:\DigitalWare\Entregables\Servidor\ServidorDCOM_TLB.pas=</Transaction>
   </Transactions>
 </BorlandProject>

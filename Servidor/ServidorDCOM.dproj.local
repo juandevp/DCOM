@@ -4,17 +4,22 @@
     <Transaction>2026/02/02 22:14:12.000.427,=C:\Users\juanc\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2026/02/02 22:49:50.000.305,=C:\Users\juanc\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2026/02/03 18:59:38.000.993,=C:\Users\juanc\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2026/02/03 19:00:20.000.316,D:\DigitalWare\Entregables\UForm.pas=C:\Users\juanc\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2026/02/03 19:00:20.000.316,D:\DigitalWare\Entregables\UForm.dfm=C:\Users\juanc\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2026/02/03 19:00:20.000.316,D:\DigitalWare\Entregables\UForm.pas=C:\Users\juanc\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2026/02/03 19:00:38.000.124,D:\DigitalWare\Entregables\ServidorDCOM.dproj=C:\Users\juanc\OneDrive\Documentos\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
-    <Transaction>2026/02/03 19:00:49.000.668,=D:\DigitalWare\Entregables\ServidorDCOM.ridl</Transaction>
     <Transaction>2026/02/03 19:00:49.000.912,=D:\DigitalWare\Entregables\Unit1.pas</Transaction>
     <Transaction>2026/02/03 19:00:49.000.697,=D:\DigitalWare\Entregables\ServidorDCOM_TLB.pas</Transaction>
+    <Transaction>2026/02/03 19:00:49.000.668,=D:\DigitalWare\Entregables\ServidorDCOM.ridl</Transaction>
     <Transaction>2026/02/03 19:01:00.000.567,D:\DigitalWare\Entregables\Servidor\ServidorDCOM_TLB.pas=D:\DigitalWare\Entregables\ServidorDCOM_TLB.pas</Transaction>
     <Transaction>2026/02/03 19:01:00.000.515,D:\DigitalWare\Entregables\Servidor\ServidorDCOM.ridl=D:\DigitalWare\Entregables\ServidorDCOM.ridl</Transaction>
     <Transaction>2026/02/03 19:01:34.000.297,D:\DigitalWare\Entregables\UDataModulo.pas=D:\DigitalWare\Entregables\Unit1.pas</Transaction>
     <Transaction>2026/02/03 19:01:34.000.297,D:\DigitalWare\Entregables\UDataModulo.dfm=D:\DigitalWare\Entregables\Unit1.dfm</Transaction>
     <Transaction>2026/02/03 19:20:02.000.271,=D:\DigitalWare\Entregables\Servidor\ServidorDCOM.ridl</Transaction>
-    <Transaction>2026/02/03 22:10:06.057,=D:\DigitalWare\Entregables\Servidor\ServidorDCOM_TLB.pas</Transaction>
+    <Transaction>2026/02/03 22:10:06.000.057,=D:\DigitalWare\Entregables\Servidor\ServidorDCOM_TLB.pas</Transaction>
+    <Transaction>2026/02/04 19:37:05.000.786,=C:\Program Files (x86)\Embarcadero\Studio\37.0\ObjRepos\ja\DelphiWin32\Vcl.recerror.pas</Transaction>
+    <Transaction>2026/02/04 19:44:23.000.138,C:\Program Files (x86)\Embarcadero\Studio\37.0\ObjRepos\ja\DelphiWin32\Vcl.recerror.pas=</Transaction>
+    <Transaction>2026/02/04 21:55:29.000.609,=D:\DigitalWare\Entregables\UtilDeplhi\UComun.pas</Transaction>
+    <Transaction>2026/02/04 21:57:39.000.714,=D:\DigitalWare\Entregables\Servidor\Unit1.pas</Transaction>
+    <Transaction>2026/02/04 21:58:18.000.564,=D:\DigitalWare\Entregables\Servidor\Unit1.pas</Transaction>
   </Transactions>
 </BorlandProject>

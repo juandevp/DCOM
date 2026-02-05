@@ -12,7 +12,7 @@ unit ActiveClientes_TLB;
 // ************************************************************************ //
 
 // $Rev: 122765 $
-// File generated on 3/02/2026 6:43:23 p. m. from Type Library described below.
+// File generated on 4/02/2026 10:38:36 p. m. from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: D:\DigitalWare\Entregables\ClienteActiveX\ActiveClientes (1)

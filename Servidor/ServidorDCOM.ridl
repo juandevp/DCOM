@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 3/02/2026 10:47:34 p. m. (- $Rev: 12980 $, 2349491234).
+// File generated on 5/02/2026 12:06:31 a. m. (- $Rev: 12980 $, 1905203).
 
 [
   uuid(B1F22042-8BC5-47E3-9CD3-D6FC4F11053A),
@@ -31,6 +31,16 @@ library ServidorDCOM
   ]
   interface IServidor: IAppServer
   {
+    [id(0x0000012D)]
+    HRESULT _stdcall EjecutarSql([in] BSTR Sql, [out, retval] long Param2);
+    [id(0x0000012E)]
+    HRESULT _stdcall EliminarCliente([in] long AIdCliente, [out, retval] long Salida);
+    [propget, id(0x0000012F)]
+    HRESULT _stdcall PEstado([out, retval] BSTR* Value);
+    [propput, id(0x0000012F)]
+    HRESULT _stdcall PEstado([in] BSTR Value);
+    [id(0x00000130)]
+    HRESULT _stdcall CrearCliente([in] BSTR ANombresCliente, [in] BSTR ADireccion, [out, retval] long Salida);
   };
 
   [
