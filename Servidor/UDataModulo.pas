@@ -1,4 +1,4 @@
-unit UDataModulo;
+﻿unit UDataModulo;
 
 {$WARN SYMBOL_PLATFORM OFF}
 
@@ -273,6 +273,7 @@ begin
    end
    else
    begin
+     FIdFacura := AIdFacura;
      InsertarDetalleFac(AIdFacura, AIdProducto, ACantidad, AValor);
      Result := 1;
    end;

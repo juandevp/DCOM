@@ -31,7 +31,7 @@ object Cliente: TCliente
     Top = 0
     Width = 640
     Height = 506
-    ActivePage = TbProductos
+    ActivePage = TbFacturar
     Align = alClient
     TabOrder = 0
     OnChange = pcGeneralChange

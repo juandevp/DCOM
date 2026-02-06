@@ -492,6 +492,8 @@ begin
   CargarDatosProductos;
   CambiarEstadoBotonesCliente(ENada);
   CambiarEstadoBotonesProductos(ENada);
+  pcGeneral.ActivePage := TbsClientes;
+  pcGeneralChange(nil);
 end;
 
 procedure TCliente.AfterMonitorDpiChangedEvent(Sender: TObject; OldDPI, NewDPI: Integer);
