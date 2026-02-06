@@ -9,7 +9,7 @@ uses
   Vcl.Forms, Vcl.Dialogs, Winapi.ActiveX, Vcl.AxCtrls, ActiveClientes_TLB, StdVcl,
   Data.DB, Datasnap.DBClient, Datasnap.Win.MConnect, Vcl.Grids, Vcl.DBGrids,
   Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Buttons, Vcl.DBCtrls, Vcl.StdCtrls,Vcl.recerror,
-  Vcl.Mask;
+  Vcl.Mask, System.UITypes,UComun;
 type
   TCliente = class(TActiveForm, ICliente)
     DCOMConnection: TDCOMConnection;
@@ -17,7 +17,7 @@ type
     pcGeneral: TPageControl;
     TbsClientes: TTabSheet;
     DbClientesLista: TDBGrid;
-    DBNavigator1: TDBNavigator;
+    DBNavCliente: TDBNavigator;
     BtnAgregar: TButton;
     CdsClientes: TClientDataSet;
     CdsClientesCLIENTE: TAutoIncField;
@@ -31,6 +31,25 @@ type
     DbEdtDireccion: TDBEdit;
     LblNombres: TLabel;
     LblDireccion: TLabel;
+    TbProductos: TTabSheet;
+    BtnAgregarProduc: TButton;
+    BtnEliminarProduc: TButton;
+    DBGdProductos: TDBGrid;
+    LblNombreProducto: TLabel;
+    DBEdtNombreProducto: TDBEdit;
+    Label2: TLabel;
+    DBEdtPrecio: TDBEdit;
+    DBNavigator2: TDBNavigator;
+    Panel1: TPanel;
+    Label3: TLabel;
+    EdtFiltrarProduc: TEdit;
+    DsProductos: TDataSource;
+    CdsProductos: TClientDataSet;
+    BtnActualizar: TButton;
+    BtnActualizarProduc: TButton;
+    CdsProductosPRODUCTO: TAutoIncField;
+    CdsProductosNOMBRE_PRODUCTO: TStringField;
+    CdsProductosVALOR: TFMTBCDField;
     procedure ActiveFormCreate(Sender: TObject);
     procedure CdsClientesReconcileError(DataSet: TCustomClientDataSet;
       E: EReconcileError; UpdateKind: TUpdateKind;
@@ -38,6 +57,7 @@ type
     procedure BtnEliminarClick(Sender: TObject);
     procedure BtnAgregarClick(Sender: TObject);
     procedure EdtFiltrarChange(Sender: TObject);
+    procedure BtnActualizarClick(Sender: TObject);
   private
     { Private declarations }
     FEvents: IClienteEvents;
@@ -54,7 +74,10 @@ type
     procedure MouseLeaveEvent(Sender: TObject);
     procedure PaintEvent(Sender: TObject);
     procedure InicializarCOM;
-    procedure CargarClientes;
+    procedure CargarDatosClientes;
+    procedure CargarDatosProductos;
+    procedure DispararMensaje(AMensaje: string; ATipoNovedad: Integer);
+    procedure CambiarEstadoBotonesCliente(AEstado: EnumEstadoForm);
   protected
     { Protected declarations }
     procedure DefinePropertyPages(DefinePropertyPage: TDefinePropertyPage); override;
@@ -397,7 +420,8 @@ end;
 procedure TCliente.ActiveFormCreate(Sender: TObject);
 begin
   InicializarCOM;
-  CargarClientes;
+  CargarDatosClientes;
+  CargarDatosProductos;
 end;
 
 procedure TCliente.AfterMonitorDpiChangedEvent(Sender: TObject; OldDPI, NewDPI: Integer);
@@ -413,34 +437,69 @@ begin
 end;
 
 procedure TCliente.BtnEliminarClick(Sender: TObject);
+var
+  Resultado: Integer;
 begin
-  ShowMessage(CdsClientesCLIENTE.AsInteger.ToString);
-  DCOMConnection.AppServer.EliminarCliente(CdsClientesCLIENTE.AsInteger);
-  MessageDlg(DCOMConnection.AppServer.PEstado, TMsgDlgType.mtInformation, [TMsgDlgBtn.mbOK], 0);
-  CdsClientes.Refresh;
+  CambiarEstadoBotonesCliente(EEliminar);
+  try
+    if  MessageDlg('¿Está seguro de que desea eliminar este cliente?',
+      TMsgDlgType.mtInformation, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrYes then
+    begin
+      Resultado := DCOMConnection.AppServer.
+        EliminarCliente(CdsClientesCLIENTE.AsInteger);
+      DispararMensaje(DCOMConnection.AppServer.PEstado, Resultado);
+      CargarDatosClientes;
+    end;
+  finally
+    CambiarEstadoBotonesCliente(ENada);
+  end;
+end;
+
+procedure TCliente.BtnActualizarClick(Sender: TObject);
+begin
+  BtnActualizar.Caption := 'Guardar';
+  CambiarEstadoBotonesCliente(EActualizar);
+  try
+    if (Trim(DbEdtNombres.Text)='') or  (Trim(DbEdtDireccion.Text)='')  then
+    begin
+       MessageDlg('Por favor, complete todos los campos obligatorios antes de guardar.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+       Exit;
+    end;
+  finally
+    CambiarEstadoBotonesCliente(ENada);
+  end;
 end;
 
 procedure TCliente.BtnAgregarClick(Sender: TObject);
+var
+  Resultado: Integer;
 begin
-  if (Trim(DbEdtNombres.Text)='') or  (Trim(DbEdtDireccion.Text)='')  then
-  begin
-     MessageDlg('Por favor, complete todos los campos obligatorios antes de guardar.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
-     Exit;
-  end;
+  CambiarEstadoBotonesCliente(ECrear);
+  try
+    if (Trim(DbEdtNombres.Text)='') or  (Trim(DbEdtDireccion.Text)='')  then
+    begin
+       MessageDlg('Por favor, complete todos los campos obligatorios antes de guardar.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+       Exit;
+    end;
 
-  if CdsClientes.State in [dsInsert] then
-  begin
-    BtnAgregar.Caption := 'Crear';
-    DCOMConnection.AppServer.
-      CrearCliente(CdsClientesNOMBRE_CLIENTE.AsString,CdsClientesDIRECCION.AsString);
-    MessageDlg(DCOMConnection.AppServer.PEstado, TMsgDlgType.mtInformation, [TMsgDlgBtn.mbOK], 0);
-    CdsClientes.Close;
-    CdsClientes.Open;
-  end
-  else
-  begin
-    CdsClientes.Insert;
-    BtnAgregar.Caption := 'Guardar';
+    if CdsClientes.State in [dsInsert] then
+    begin
+      BtnAgregar.Caption := 'Crear';
+      Resultado := DCOMConnection.AppServer.
+        CrearCliente(CdsClientesNOMBRE_CLIENTE.AsString,CdsClientesDIRECCION.AsString);
+      DispararMensaje(DCOMConnection.AppServer.PEstado, Resultado);
+      CargarDatosClientes;
+    end
+    else
+    begin
+      CdsClientes.Insert;
+      BtnAgregar.Caption := 'Guardar';
+    end;
+  finally
+    if CdsClientes.State in [dsBrowse] then
+    begin
+      CambiarEstadoBotonesCliente(ENada);
+    end;
   end;
 end;
 
@@ -497,11 +556,38 @@ procedure TCliente.InicializarCOM;
 begin
   DCOMConnection.Connected := True;
 end;
-
-procedure TCliente.CargarClientes;
+procedure TCliente.CargarDatosClientes;
 begin
   CdsClientes.Close;
   CdsClientes.Open;
+end;
+
+procedure TCliente.CargarDatosProductos;
+begin
+  CdsProductos.Close;
+  CdsProductos.Open;
+end;
+
+procedure TCliente.CambiarEstadoBotonesCliente(AEstado: EnumEstadoForm);
+begin
+  BtnAgregar.Enabled := (AEstado = EnumEstadoForm.ECrear)
+    or (AEstado = EnumEstadoForm.ENada);
+  BtnEliminar.Enabled := (AEstado = EnumEstadoForm.EEliminar)
+    or (AEstado = EnumEstadoForm.ENada);
+  BtnActualizar.Enabled := (AEstado = EnumEstadoForm.EActualizar)
+    or (AEstado = EnumEstadoForm.ENada);
+  DBNavCliente.Enabled := (AEstado = EnumEstadoForm.ENada);
+  DbClientesLista.Enabled := (AEstado = EnumEstadoForm.ENada);
+end;
+
+procedure TCliente.DispararMensaje(AMensaje: string; ATipoNovedad: Integer);
+begin
+  case ATipoNovedad of
+    1:
+      MessageDlg(AMensaje, TMsgDlgType.mtInformation, [TMsgDlgBtn.mbOK], 0);
+    -1:
+      MessageDlg(AMensaje, TMsgDlgType.mtError, [TMsgDlgBtn.mbOK], 0);
+  end;
 end;
 
 procedure TCliente.CdsClientesReconcileError(DataSet: TCustomClientDataSet;

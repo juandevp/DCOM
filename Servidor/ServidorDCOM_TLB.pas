@@ -12,7 +12,7 @@ unit ServidorDCOM_TLB;
 // ************************************************************************ //
 
 // $Rev: 122765 $
-// File generated on 5/02/2026 12:06:28 a. m. from Type Library described below.
+// File generated on 5/02/2026 8:02:45 p. m. from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: D:\DigitalWare\Entregables\Servidor\ServidorDCOM (1)
@@ -80,6 +80,10 @@ type
     function Get_PEstado: WideString; safecall;
     procedure Set_PEstado(const Value: WideString); safecall;
     function CrearCliente(const ANombresCliente: WideString; const ADireccion: WideString): Integer; safecall;
+    function CrearProducto(const ANombreProduc: WideString; AValor: Double): Integer; safecall;
+    function EliminarProducto(AIdProduc: Integer): Integer; safecall;
+    procedure ActualizaCliente; safecall;
+    procedure ActualizarProducto; safecall;
     property PEstado: WideString read Get_PEstado write Set_PEstado;
   end;
 
@@ -94,6 +98,10 @@ type
     function EliminarCliente(AIdCliente: Integer): Integer; dispid 302;
     property PEstado: WideString dispid 303;
     function CrearCliente(const ANombresCliente: WideString; const ADireccion: WideString): Integer; dispid 304;
+    function CrearProducto(const ANombreProduc: WideString; AValor: Double): Integer; dispid 305;
+    function EliminarProducto(AIdProduc: Integer): Integer; dispid 306;
+    procedure ActualizaCliente; dispid 307;
+    procedure ActualizarProducto; dispid 308;
     function AS_ApplyUpdates(const ProviderName: WideString; Delta: OleVariant; MaxErrors: SYSINT;
                              out ErrorCount: SYSINT; var OwnerData: OleVariant): OleVariant; dispid 20000000;
     function AS_GetRecords(const ProviderName: WideString; Count: SYSINT; out RecsOut: SYSINT;

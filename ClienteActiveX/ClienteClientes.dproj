@@ -100,6 +100,7 @@
             <Form>ReconcileErrorForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\UtilDeplhi\UComun.pas"/>
         <RidlCompile Include="ActiveClientes.ridl"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

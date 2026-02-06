@@ -25,6 +25,15 @@ type
     QValidarFacturasCliente: TFDQuery;
     QEliminarCliente: TFDQuery;
     QCrearCliente: TFDQuery;
+    qProductos: TFDQuery;
+    qEliminarProductos: TFDQuery;
+    qCrearProductos: TFDQuery;
+    qActualizarProducto: TFDQuery;
+    qActualizarCliente: TFDQuery;
+    qProductosPRODUCTO: TFDAutoIncField;
+    qProductosNOMBRE_PRODUCTO: TStringField;
+    qProductosVALOR: TFMTBCDField;
+    DspProductos: TDataSetProvider;
   private
     FNovedades: WideString;
     { Private declarations }
@@ -36,6 +45,11 @@ type
     function Get_PEstado: WideString; safecall;
     procedure Set_PEstado(const Value: WideString); safecall;
     function CrearCliente(const ANombresCliente, ADireccion: WideString): Integer; safecall;
+    function CrearProducto(const ANombreProduc: WideString; AValor: Double): Integer;
+          safecall;
+    function EliminarProducto(AIdProduc: Integer): Integer; safecall;
+    procedure ActualizaCliente; safecall;
+    procedure ActualizarProducto; safecall;
 
 
 
@@ -75,26 +89,31 @@ end;
 
 function TServidor.EliminarCliente(AIdCliente: Integer): Integer;
 begin
-
-  QValidarFacturasCliente.ParamByName('CLIENTE').AsInteger := AIdCliente;
-  QValidarFacturasCliente.Open;
   try
-    if QValidarFacturasCliente.FieldByName('TotalFac').AsInteger > 0 then
-    begin
-      Result := 1;
-      FNovedades := 'No se puede eliminar el cliente porque '+
-        ' tiene más de una factura registrada.';
-    end
-    else
-    begin
-      QEliminarCliente.ParamByName('CLIENTE').AsInteger := AIdCliente;
-      QEliminarCliente.ExecSQL;
-      FNovedades:= 'El cliente fue eliminado correctamente.';
-      Result := -1;
+    QValidarFacturasCliente.ParamByName('CLIENTE').AsInteger := AIdCliente;
+    QValidarFacturasCliente.Open;
+    try
+      if QValidarFacturasCliente.FieldByName('TotalFac').AsInteger > 0 then
+      begin
+        Result := -1;
+        FNovedades := 'No se puede eliminar el cliente porque '+
+          ' tiene más de una factura registrada.';
+      end
+      else
+      begin
+        QEliminarCliente.ParamByName('CLIENTE').AsInteger := AIdCliente;
+        QEliminarCliente.ExecSQL;
+        FNovedades:= 'El cliente fue eliminado correctamente.';
+        Result := 1;
+      end;
+    finally
+      QValidarFacturasCliente.Close;
     end;
-  finally
-    QValidarFacturasCliente.Close;
+    except
+      on E: Exception do
+      FNovedades:= E.Message + '. Novedad eliminando cliente.';
   end;
+
 end;
 
 function TServidor.Get_PEstado: WideString;
@@ -110,10 +129,38 @@ end;
 function TServidor.CrearCliente(const ANombresCliente, ADireccion: WideString): Integer;
 
 begin
+  Result := -1;
   QCrearCliente.ParamByName('NOMBRE_CLIENTE').AsString := ANombresCliente;
   QCrearCliente.ParamByName('DIRECCION').AsString := ADireccion;
-  QCrearCliente.ExecSQL;
-  FNovedades:= 'El cliente fue creado correctamente.';
+  try
+    QCrearCliente.ExecSQL;
+    Result := 1;
+    FNovedades:= 'El cliente fue creado correctamente.';
+  except
+    on E: Exception do
+    FNovedades:= E.Message + '. Novedad creando cliente.';
+  end;
+end;
+
+function TServidor.CrearProducto(const ANombreProduc: WideString; AValor: Double): Integer;
+
+begin
+
+end;
+
+function TServidor.EliminarProducto(AIdProduc: Integer): Integer;
+begin
+
+end;
+
+procedure TServidor.ActualizaCliente;
+begin
+
+end;
+
+procedure TServidor.ActualizarProducto;
+begin
+
 end;
 
 initialization

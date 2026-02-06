@@ -2,7 +2,7 @@ unit UComun;
 
 interface
 
-type EnumEstado = (EError, ECompletado);
+type EnumEstadoForm = (ENada,ECrear, EEliminar, EActualizar);
 
 implementation
 
