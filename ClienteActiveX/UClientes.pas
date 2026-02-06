@@ -37,12 +37,12 @@ type
     TbProductos: TTabSheet;
     BtnAgregarProduc: TButton;
     BtnEliminarProduc: TButton;
-    DBGdProductos: TDBGrid;
+    DbProductosLista: TDBGrid;
     LblNombreProducto: TLabel;
     DBEdtNombreProducto: TDBEdit;
     Label2: TLabel;
     DBEdtPrecio: TDBEdit;
-    DBNavigator2: TDBNavigator;
+    DBNavProduc: TDBNavigator;
     Panel1: TPanel;
     Label3: TLabel;
     EdtFiltrarProduc: TEdit;
@@ -65,7 +65,7 @@ type
     Label6: TLabel;
     BtnAgregarDetalle: TButton;
     BtnGenerarFactura: TButton;
-    LimpiarFactura: TButton;
+    BtnLimpiarFactura: TButton;
     DBNavigator1: TDBNavigator;
     MTDetalleFactura: TFDMemTable;
     MTDetalleFacturaNOMBRE_PRODUCTO: TStringField;
@@ -74,6 +74,8 @@ type
     MTDetalleFacturaPRODUCTO_ID: TIntegerField;
     MTDetalleFacturaNOMBRE_CLIENTE: TStringField;
     MTDetalleFacturaVALOR: TBCDField;
+    LBlTotalFactura: TLabel;
+    Label7: TLabel;
     procedure ActiveFormCreate(Sender: TObject);
     procedure CdsClientesReconcileError(DataSet: TCustomClientDataSet;
       E: EReconcileError; UpdateKind: TUpdateKind;
@@ -83,11 +85,14 @@ type
     procedure EdtFiltrarChange(Sender: TObject);
     procedure BtnActualizarClick(Sender: TObject);
     procedure BtnAgregarDetalleClick(Sender: TObject);
-    procedure LimpiarFacturaClick(Sender: TObject);
+    procedure BtnLimpiarFacturaClick(Sender: TObject);
     procedure pcGeneralChange(Sender: TObject);
+    procedure BtnActualizarProducClick(Sender: TObject);
+    procedure BtnGenerarFacturaClick(Sender: TObject);
   private
     { Private declarations }
     FEvents: IClienteEvents;
+    FTotalFactura: Currency;
     procedure ActivateEvent(Sender: TObject);
     procedure AfterMonitorDpiChangedEvent(Sender: TObject; OldDPI, NewDPI: Integer);
     procedure BeforeMonitorDpiChangedEvent(Sender: TObject; OldDPI, NewDPI: Integer);
@@ -105,6 +110,7 @@ type
     procedure CargarDatosProductos;
     procedure DispararMensaje(AMensaje: string; ATipoNovedad: Integer);
     procedure CambiarEstadoBotonesCliente(AEstado: EnumEstadoForm);
+    procedure CambiarEstadoBotonesProductos(AEstado: EnumEstadoForm);
   protected
     { Protected declarations }
     procedure DefinePropertyPages(DefinePropertyPage: TDefinePropertyPage); override;
@@ -467,7 +473,7 @@ procedure TCliente.BtnEliminarClick(Sender: TObject);
 var
   Resultado: Integer;
 begin
-  CambiarEstadoBotonesCliente(EEliminar);
+  CambiarEstadoBotonesProductos(EEliminar);
   try
     if  MessageDlg('¿Está seguro de que desea eliminar este cliente?',
       TMsgDlgType.mtInformation, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrYes then
@@ -478,8 +484,35 @@ begin
       CargarDatosClientes;
     end;
   finally
-    CambiarEstadoBotonesCliente(ENada);
+    CambiarEstadoBotonesProductos(ENada);
   end;
+end;
+
+procedure TCliente.BtnGenerarFacturaClick(Sender: TObject);
+var IdFactura: Integer;
+begin
+  MTDetalleFactura.First;
+  IdFactura := -1;
+  while not MTDetalleFactura.Eof do
+  begin
+    ShowMessage( DCOMConnection.AppServer.Facturar(IdFactura, MTDetalleFacturaPRODUCTO_ID.AsInteger,
+      MTDetalleFacturaCLIENTE_ID.AsInteger, FTotalFactura, MTDetalleFacturaVALOR.AsCurrency, MTDetalleFacturaCANTIDAD.AsInteger));
+    MTDetalleFactura.Next;
+    if IdFactura <> -1 then
+    begin
+      if DCOMConnection.AppServer.IdFactura > 1 then
+      begin
+        IdFactura := DCOMConnection.AppServer.IdFactura;
+      end
+      else
+        raise Exception.Create('Se detectaron inconsistencias en el consecutivo de la factura.');
+    end
+    else if (IdFactura <> DCOMConnection.AppServer.IdFactura) then
+    begin
+      raise Exception.Create('a numeración de la factura cambió. Por favor, vuelva a intentarlo.');
+    end;
+  end;
+  BtnLimpiarFacturaClick(nil);
 end;
 
 procedure TCliente.BtnActualizarClick(Sender: TObject);
@@ -497,6 +530,21 @@ begin
   end;
 end;
 
+procedure TCliente.BtnActualizarProducClick(Sender: TObject);
+begin
+  BtnActualizar.Caption := 'Guardar';
+  CambiarEstadoBotonesProductos(EActualizar);
+  try
+    if (Trim(DbEdtNombres.Text)='') or  (Trim(DbEdtDireccion.Text)='')  then
+    begin
+       MessageDlg('Por favor, complete todos los campos obligatorios antes de guardar.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+       Exit;
+    end;
+  finally
+    CambiarEstadoBotonesProductos(ENada);
+  end;
+end;
+
 procedure TCliente.BtnAgregarClick(Sender: TObject);
 var
   Resultado: Integer;
@@ -507,7 +555,7 @@ begin
     Exit;
   end;
 
-  CambiarEstadoBotonesCliente(ECrear);
+  CambiarEstadoBotonesProductos(ECrear);
   try
     if (Trim(DbEdtNombres.Text)='') or  (Trim(DbEdtDireccion.Text)='')  then
     begin
@@ -531,7 +579,7 @@ begin
   finally
     if CdsClientes.State in [dsBrowse] then
     begin
-      CambiarEstadoBotonesCliente(ENada);
+      CambiarEstadoBotonesProductos(ENada);
     end;
   end;
 end;
@@ -551,8 +599,11 @@ begin
   MTDetalleFacturaNOMBRE_PRODUCTO.AsString := CdsProductosNOMBRE_PRODUCTO.AsString;
   MTDetalleFacturaPRODUCTO_ID.AsInteger := CdsProductosPRODUCTO.AsInteger;
   MTDetalleFacturaVALOR.AsBCD := (MTDetalleFacturaCANTIDAD.AsInteger * CdsProductosVALOR.AsBCD);
-
+  FTotalFactura := MTDetalleFacturaVALOR.AsCurrency + FTotalFactura;
+  LBlTotalFactura.Caption := FormatCurr('#,##0', FTotalFactura);
   MTDetalleFactura.Post;
+  DBLCBProducto.KeyValue := Null;
+  SECantidad.Value := 0;
 end;
 
 procedure TCliente.ClickEvent(Sender: TObject);
@@ -589,12 +640,14 @@ begin
   Key := Char(TempKey);
 end;
 
-procedure TCliente.LimpiarFacturaClick(Sender: TObject);
+procedure TCliente.BtnLimpiarFacturaClick(Sender: TObject);
 begin
   DBLCBCliente.KeyValue := Null;
   DBLCBProducto.KeyValue := Null;
   SECantidad.Value := 0;
   MTDetalleFactura.EmptyDataSet;
+  LBlTotalFactura.Caption := '0';
+  FTotalFactura := 0;
 end;
 
 procedure TCliente.MouseEnterEvent(Sender: TObject);
@@ -618,7 +671,7 @@ begin
   if pcGeneral.ActivePage = TbFacturar then
   begin
      MTDetalleFactura.Open;
-     LimpiarFacturaClick(nil);
+     BtnLimpiarFacturaClick(nil);
   end;
 end;
 
@@ -636,6 +689,18 @@ procedure TCliente.CargarDatosProductos;
 begin
   CdsProductos.Close;
   CdsProductos.Open;
+end;
+
+procedure TCliente.CambiarEstadoBotonesProductos(AEstado: EnumEstadoForm);
+begin
+  BtnAgregarProduc.Enabled := (AEstado = EnumEstadoForm.ECrear)
+    or (AEstado = EnumEstadoForm.ENada);
+  BtnEliminarProduc.Enabled := (AEstado = EnumEstadoForm.EEliminar)
+    or (AEstado = EnumEstadoForm.ENada);
+  BtnActualizarProduc.Enabled := (AEstado = EnumEstadoForm.EActualizar)
+    or (AEstado = EnumEstadoForm.ENada);
+  DBNavProduc.Enabled := (AEstado = EnumEstadoForm.ENada);
+  DbProductosLista.Enabled := (AEstado = EnumEstadoForm.ENada);
 end;
 
 procedure TCliente.CambiarEstadoBotonesCliente(AEstado: EnumEstadoForm);

@@ -25,18 +25,24 @@ type
     QValidarFacturasCliente: TFDQuery;
     QEliminarCliente: TFDQuery;
     QCrearCliente: TFDQuery;
-    qProductos: TFDQuery;
-    qEliminarProductos: TFDQuery;
-    qCrearProductos: TFDQuery;
-    qActualizarProducto: TFDQuery;
+    QProductos: TFDQuery;
+    QEliminarProductos: TFDQuery;
+    QCrearProductos: TFDQuery;
+    QActualizarProducto: TFDQuery;
     qActualizarCliente: TFDQuery;
-    qProductosPRODUCTO: TFDAutoIncField;
-    qProductosNOMBRE_PRODUCTO: TStringField;
-    qProductosVALOR: TFMTBCDField;
+    QProductosPRODUCTO: TFDAutoIncField;
+    QProductosNOMBRE_PRODUCTO: TStringField;
+    QProductosVALOR: TFMTBCDField;
     DspProductos: TDataSetProvider;
     qVerificarFacturasProducto: TFDQuery;
+    QInsertarCabezaFac: TFDQuery;
+    QInsertarDetalleFac: TFDQuery;
+    qFacSec: TFDQuery;
+    qFacSecNumFac: TIntegerField;
   private
     FNovedades: WideString;
+    FIdFacura: Integer;
+    procedure InsertarDetalleFac(AIdFacura, AIdProducto, ACantidad: Integer; AValor: Double);
     { Private declarations }
   protected
 
@@ -51,6 +57,10 @@ type
     function EliminarProducto(AIdProduc: Integer): Integer; safecall;
     procedure ActualizaCliente; safecall;
     procedure ActualizarProducto; safecall;
+    function Get_IdFactura: Integer; safecall;
+    procedure Set_IdFactura(Value: Integer); safecall;
+    function Facturar(AIdFacura, AIdProducto, AIdCliente: Integer; ATotalFactura, AValor: Double;
+          ACantidad: Integer): Integer; safecall;
 
 
 
@@ -188,12 +198,54 @@ end;
 
 procedure TServidor.ActualizaCliente;
 begin
-
 end;
 
 procedure TServidor.ActualizarProducto;
 begin
 
+end;
+
+procedure TServidor.InsertarDetalleFac(AIdFacura, AIdProducto, ACantidad: Integer; AValor: Double);
+begin
+  QInsertarDetalleFac.ParamByName('NUMERO_FACTURA').AsInteger := AIdFacura;
+  QInsertarDetalleFac.ParamByName('PRODUCTO_ID').AsInteger := AIdProducto;
+  QInsertarDetalleFac.ParamByName('CANTIDAD').AsInteger := ACantidad;
+  QInsertarDetalleFac.ParamByName('VALOR').AsBCD := AValor;
+  QInsertarDetalleFac.ExecSQL;
+end;
+function TServidor.Get_IdFactura: Integer;
+begin
+ Result := FIdFacura;
+end;
+
+procedure TServidor.Set_IdFactura(Value: Integer);
+begin
+  FIdFacura := Value;
+end;
+
+function TServidor.Facturar(AIdFacura, AIdProducto, AIdCliente: Integer; ATotalFactura,
+          AValor: Double; ACantidad: Integer): Integer;
+begin
+   FIdFacura := -1;
+   if AIdFacura = -1 then
+   begin
+      qFacSec.Open;
+      try
+        FIdFacura := qFacSecNumFac.AsInteger;
+        QInsertarCabezaFac.ParamByName('NUMERO').AsInteger := FIdFacura;
+        QInsertarCabezaFac.ParamByName('CLIENTE_ID').AsInteger := AIdCliente;
+        QInsertarCabezaFac.ParamByName('TOTAL').AsBCD := ATotalFactura;
+        QInsertarCabezaFac.ExecSQL;
+        InsertarDetalleFac(FIdFacura, AIdProducto, ACantidad, AValor);
+        Result := 1;
+      finally
+        qFacSec.Close;
+      end;
+   end
+   else
+   begin
+     InsertarDetalleFac(FIdFacura, AIdProducto, ACantidad, AValor);
+   end;
 end;
 
 initialization

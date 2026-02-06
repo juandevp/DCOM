@@ -12,7 +12,7 @@ unit ServidorDCOM_TLB;
 // ************************************************************************ //
 
 // $Rev: 122765 $
-// File generated on 5/02/2026 8:48:28 p. m. from Type Library described below.
+// File generated on 5/02/2026 11:55:04 p. m. from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: D:\DigitalWare\Entregables\Servidor\ServidorDCOM (1)
@@ -84,7 +84,12 @@ type
     function EliminarProducto(AIdProduc: Integer): Integer; safecall;
     procedure ActualizaCliente; safecall;
     procedure ActualizarProducto; safecall;
+    function Facturar(AIdFacura: Integer; AIdProducto: Integer; AIdCliente: Integer;
+                      ATotalFactura: Double; AValor: Double; ACantidad: Integer): Integer; safecall;
+    function Get_IdFactura: Integer; safecall;
+    procedure Set_IdFactura(Value: Integer); safecall;
     property PEstado: WideString read Get_PEstado write Set_PEstado;
+    property IdFactura: Integer read Get_IdFactura write Set_IdFactura;
   end;
 
 // *********************************************************************//
@@ -102,6 +107,9 @@ type
     function EliminarProducto(AIdProduc: Integer): Integer; dispid 306;
     procedure ActualizaCliente; dispid 307;
     procedure ActualizarProducto; dispid 308;
+    function Facturar(AIdFacura: Integer; AIdProducto: Integer; AIdCliente: Integer;
+                      ATotalFactura: Double; AValor: Double; ACantidad: Integer): Integer; dispid 309;
+    property IdFactura: Integer dispid 310;
     function AS_ApplyUpdates(const ProviderName: WideString; Delta: OleVariant; MaxErrors: SYSINT;
                              out ErrorCount: SYSINT; var OwnerData: OleVariant): OleVariant; dispid 20000000;
     function AS_GetRecords(const ProviderName: WideString; Count: SYSINT; out RecsOut: SYSINT;

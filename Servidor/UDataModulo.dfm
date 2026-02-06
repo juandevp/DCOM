@@ -95,30 +95,30 @@ object Servidor: TServidor
         Value = 'ASDASDASD'
       end>
   end
-  object qProductos: TFDQuery
+  object QProductos: TFDQuery
     Connection = Conn
     SQL.Strings = (
       'select * from [DW].[dbo].PRODUCTOS order by producto desc')
     Left = 528
     Top = 32
-    object qProductosPRODUCTO: TFDAutoIncField
+    object QProductosPRODUCTO: TFDAutoIncField
       FieldName = 'PRODUCTO'
       Origin = 'PRODUCTO'
       ProviderFlags = [pfInWhere, pfInKey]
     end
-    object qProductosNOMBRE_PRODUCTO: TStringField
+    object QProductosNOMBRE_PRODUCTO: TStringField
       FieldName = 'NOMBRE_PRODUCTO'
       Origin = 'NOMBRE_PRODUCTO'
       Size = 100
     end
-    object qProductosVALOR: TFMTBCDField
+    object QProductosVALOR: TFMTBCDField
       FieldName = 'VALOR'
       Origin = 'VALOR'
       Precision = 18
       Size = 2
     end
   end
-  object qEliminarProductos: TFDQuery
+  object QEliminarProductos: TFDQuery
     Connection = Conn
     SQL.Strings = (
       'DELETE FROM PRODUCTOS WHERE PRODUCTO =:PRODUCTO')
@@ -132,7 +132,7 @@ object Servidor: TServidor
         Value = Null
       end>
   end
-  object qCrearProductos: TFDQuery
+  object QCrearProductos: TFDQuery
     Connection = Conn
     SQL.Strings = (
       
@@ -154,7 +154,7 @@ object Servidor: TServidor
         Value = Null
       end>
   end
-  object qActualizarProducto: TFDQuery
+  object QActualizarProducto: TFDQuery
     Connection = Conn
     SQL.Strings = (
       'UPDATE PRODUCTOS'
@@ -216,7 +216,7 @@ object Servidor: TServidor
       end>
   end
   object DspProductos: TDataSetProvider
-    DataSet = qProductos
+    DataSet = QProductos
     ResolveToDataSet = True
     Options = [poAutoRefresh, poUseQuoteChar]
     Left = 432
@@ -242,5 +242,94 @@ object Servidor: TServidor
         Size = 1
         Value = Null
       end>
+  end
+  object QInsertarCabezaFac: TFDQuery
+    Connection = Conn
+    SQL.Strings = (
+      'INSERT INTO CABEZA_FACTURA'
+      '           (NUMERO'
+      '           ,FECHA'
+      '           ,CLIENTE_ID'
+      '           ,TOTAL)'
+      '     VALUES'
+      '           (:NUMERO'
+      '           ,SYSDATETIME()'
+      '           ,:CLIENTE_ID'
+      '           ,:TOTAL)')
+    Left = 328
+    Top = 288
+    ParamData = <
+      item
+        Name = 'NUMERO'
+        DataType = ftInteger
+        ParamType = ptInput
+        Value = Null
+      end
+      item
+        Name = 'CLIENTE_ID'
+        DataType = ftInteger
+        ParamType = ptInput
+        Value = 1
+      end
+      item
+        Name = 'TOTAL'
+        DataType = ftBCD
+        ParamType = ptInput
+        Value = 100000c
+      end>
+  end
+  object QInsertarDetalleFac: TFDQuery
+    Connection = Conn
+    SQL.Strings = (
+      'INSERT INTO DETALLE_FACTURA'
+      '           (NUMERO_FACTURA'
+      '           ,PRODUCTO_ID'
+      '           ,CANTIDAD'
+      '           ,VALOR)'
+      '     VALUES'
+      '           (:NUMERO_FACTURA'
+      '           ,:PRODUCTO_ID'
+      '           ,:CANTIDAD'
+      '           ,:VALOR)')
+    Left = 328
+    Top = 344
+    ParamData = <
+      item
+        Name = 'NUMERO_FACTURA'
+        DataType = ftInteger
+        ParamType = ptInput
+        Value = Null
+      end
+      item
+        Name = 'PRODUCTO_ID'
+        DataType = ftInteger
+        ParamType = ptInput
+        Value = Null
+      end
+      item
+        Name = 'CANTIDAD'
+        DataType = ftInteger
+        ParamType = ptInput
+        Value = Null
+      end
+      item
+        Name = 'VALOR'
+        DataType = ftBCD
+        ParamType = ptInput
+        Value = Null
+      end>
+  end
+  object qFacSec: TFDQuery
+    Connection = Conn
+    SQL.Strings = (
+      'select next value for Numerofactura as NumFac;')
+    Left = 328
+    Top = 234
+    object qFacSecNumFac: TIntegerField
+      FieldName = 'NumFac'
+      Origin = 'NumFac'
+      ReadOnly = True
+      Required = True
+    end
   end
 end

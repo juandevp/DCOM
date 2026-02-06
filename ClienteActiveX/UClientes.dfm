@@ -230,7 +230,7 @@ object Cliente: TCliente
         TabOrder = 1
         OnClick = BtnEliminarClick
       end
-      object DBGdProductos: TDBGrid
+      object DbProductosLista: TDBGrid
         Left = 0
         Top = 202
         Width = 632
@@ -278,7 +278,7 @@ object Cliente: TCliente
         DataSource = DsProductos
         TabOrder = 4
       end
-      object DBNavigator2: TDBNavigator
+      object DBNavProduc: TDBNavigator
         Left = 0
         Top = 451
         Width = 632
@@ -319,9 +319,9 @@ object Cliente: TCliente
         Top = 106
         Width = 75
         Height = 25
-        Caption = 'Actualizar'
+        Caption = 'Editar'
         TabOrder = 7
-        OnClick = BtnAgregarClick
+        OnClick = BtnActualizarProducClick
       end
     end
     object TbFacturar: TTabSheet
@@ -368,6 +368,26 @@ object Cliente: TCliente
         Font.Name = 'Segoe UI'
         Font.Style = [fsBold]
         ParentFont = False
+      end
+      object LBlTotalFactura: TLabel
+        Left = 504
+        Top = 1
+        Width = 7
+        Height = 15
+        Caption = '0'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clCrimson
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold, fsItalic, fsUnderline]
+        ParentFont = False
+      end
+      object Label7: TLabel
+        Left = 428
+        Top = 1
+        Width = 70
+        Height = 15
+        Caption = 'Total Factura:'
       end
       object DBGrid1: TDBGrid
         Left = 0
@@ -441,7 +461,7 @@ object Cliente: TCliente
         Top = 77
         Width = 105
         Height = 24
-        Caption = 'Agregar Detalle'
+        Caption = 'Agregar detalle'
         TabOrder = 4
         OnClick = BtnAgregarDetalleClick
       end
@@ -451,18 +471,19 @@ object Cliente: TCliente
         Width = 632
         Height = 34
         Align = alBottom
-        Caption = 'Generar Facturaci'#243'n'
+        Caption = 'Generar factura'
         TabOrder = 5
+        OnClick = BtnGenerarFacturaClick
         ExplicitTop = 422
       end
-      object LimpiarFactura: TButton
+      object BtnLimpiarFactura: TButton
         Left = 453
         Top = 47
         Width = 105
         Height = 24
         Caption = 'Limpiar factura'
         TabOrder = 6
-        OnClick = LimpiarFacturaClick
+        OnClick = BtnLimpiarFacturaClick
       end
       object DBNavigator1: TDBNavigator
         Left = 0
