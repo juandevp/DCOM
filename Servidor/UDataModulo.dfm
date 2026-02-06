@@ -48,18 +48,15 @@ object Servidor: TServidor
     UpdateOptions.KeyFields = 'CLIENTE_ID'
     SQL.Strings = (
       
-        'SELECT COUNT(*) As TotalFac FROM CLIENTES C INNER JOIN CABEZA_FA' +
-        'CTURA CF ON  CF.CLIENTE_ID =  C.CLIENTE WHERE C.CLIENTE = :CLIEN' +
-        'TE')
-    Left = 216
-    Top = 160
+        'SELECT COUNT(*) As TotalFac FROM PRODUCTOS P INNER JOIN DETALLE_' +
+        'FACTURA CF ON  CF.PRODUCTO_ID =  P.PRODUCTO WHERE P.PRODUCTO = :' +
+        'PRODUCTO')
+    Left = 184
+    Top = 208
     ParamData = <
       item
-        Name = 'CLIENTE'
-        DataType = ftInteger
+        Name = 'PRODUCTO'
         ParamType = ptInput
-        Size = 1
-        Value = Null
       end>
   end
   object QEliminarCliente: TFDQuery
@@ -224,5 +221,26 @@ object Servidor: TServidor
     Options = [poAutoRefresh, poUseQuoteChar]
     Left = 432
     Top = 32
+  end
+  object qVerificarFacturasProducto: TFDQuery
+    Connection = Conn
+    UpdateOptions.AssignedValues = [uvGeneratorName]
+    UpdateOptions.UpdateTableName = 'CLIENTES'
+    UpdateOptions.KeyFields = 'CLIENTE_ID'
+    SQL.Strings = (
+      
+        'SELECT COUNT(*) As TotalFac FROM CLIENTES C INNER JOIN CABEZA_FA' +
+        'CTURA CF ON  CF.CLIENTE_ID =  C.CLIENTE WHERE C.CLIENTE = :CLIEN' +
+        'TE')
+    Left = 392
+    Top = 160
+    ParamData = <
+      item
+        Name = 'CLIENTE'
+        DataType = ftInteger
+        ParamType = ptInput
+        Size = 1
+        Value = Null
+      end>
   end
 end

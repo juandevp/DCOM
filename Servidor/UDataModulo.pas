@@ -34,6 +34,7 @@ type
     qProductosNOMBRE_PRODUCTO: TStringField;
     qProductosVALOR: TFMTBCDField;
     DspProductos: TDataSetProvider;
+    qVerificarFacturasProducto: TFDQuery;
   private
     FNovedades: WideString;
     { Private declarations }
@@ -143,14 +144,46 @@ begin
 end;
 
 function TServidor.CrearProducto(const ANombreProduc: WideString; AValor: Double): Integer;
-
 begin
-
+  Result := -1;
+  qCrearProductos.ParamByName('NOMBRE_PRODUCTO').AsString := ANombreProduc;
+  qCrearProductos.ParamByName('VALOR').AsBCD := AValor;
+  try
+    qCrearProductos.ExecSQL;
+    Result := 1;
+    FNovedades:= 'El producto fue creado correctamente.';
+  except
+    on E: Exception do
+    FNovedades:= E.Message + '. Novedad creando producto.';
+  end;
 end;
 
 function TServidor.EliminarProducto(AIdProduc: Integer): Integer;
 begin
-
+  try
+    qVerificarFacturasProducto.ParamByName('PRODUCTO').AsInteger := AIdProduc;
+    qVerificarFacturasProducto.Open;
+    try
+      if QValidarFacturasCliente.FieldByName('TotalFac').AsInteger > 0 then
+      begin
+        Result := -1;
+        FNovedades := 'No se puede eliminar el producto porque '+
+          ' tiene más de una factura registrada.';
+      end
+      else
+      begin
+        QEliminarCliente.ParamByName('PRODUCTO').AsInteger := AIdProduc;
+        QEliminarCliente.ExecSQL;
+        FNovedades:= 'El prodcuto fue eliminado correctamente.';
+        Result := 1;
+      end;
+    finally
+      qVerificarFacturasProducto.Close;
+    end;
+    except
+      on E: Exception do
+      FNovedades:= E.Message + '. producto eliminando cliente.';
+  end;
 end;
 
 procedure TServidor.ActualizaCliente;
