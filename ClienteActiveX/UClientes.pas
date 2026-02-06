@@ -12,7 +12,9 @@ uses
   Vcl.Mask, System.UITypes,UComun, Vcl.Samples.Spin, System.Variants,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client;
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, REST.Types, REST.Client,
+  REST.Response.Adapter, Data.Bind.Components, Data.Bind.ObjectScope,
+  REST.Backend.EMSProvider,Winapi.ShellAPI;
 type
   TCliente = class(TActiveForm, ICliente)
     DCOMConnection: TDCOMConnection;
@@ -76,6 +78,15 @@ type
     MTDetalleFacturaVALOR: TBCDField;
     LBlTotalFactura: TLabel;
     Label7: TLabel;
+    RESTRequest: TRESTRequest;
+    RESTResponse: TRESTResponse;
+    RESTResponseDataSetAdapter: TRESTResponseDataSetAdapter;
+    RESTClient: TRESTClient;
+    CdsPlanoFac: TClientDataSet;
+    CdsPlanoFacnumero: TWideStringField;
+    CdsPlanoFacfecha: TWideStringField;
+    CdsPlanoFaccliente_Id: TWideStringField;
+    CdsPlanoFactotal: TWideStringField;
     procedure ActiveFormCreate(Sender: TObject);
     procedure CdsClientesReconcileError(DataSet: TCustomClientDataSet;
       E: EReconcileError; UpdateKind: TUpdateKind;
@@ -89,6 +100,7 @@ type
     procedure pcGeneralChange(Sender: TObject);
     procedure BtnActualizarProducClick(Sender: TObject);
     procedure BtnGenerarFacturaClick(Sender: TObject);
+    procedure GenerarFacturaPlano;
   private
     { Private declarations }
     FEvents: IClienteEvents;
@@ -487,7 +499,32 @@ begin
     CambiarEstadoBotonesProductos(ENada);
   end;
 end;
+procedure TCliente.GenerarFacturaPlano;
+var
+  RutaArchivo: string;
+  TxtFac: TStringList;
+begin
+  RutaArchivo := 'Factura_' + CdsPlanoFac.FieldByName('numero').AsString + '.txt';
 
+  TxtFac := TStringList.Create;
+  try
+    TxtFac.Add('FACTURA');
+    TxtFac.Add('--------------------------------');
+    TxtFac.Add('Número: ' + CdsPlanoFac.FieldByName('numero').AsString);
+    TxtFac.Add('Fecha y hora: ' + CdsPlanoFac.FieldByName('fecha').AsString);
+    TxtFac.Add('Cliente ID: ' + CdsPlanoFac.FieldByName('cliente_Id').AsString);
+    TxtFac.Add('--------------------------------');
+    TxtFac.Add('TOTAL: $' +
+      FormatFloat('#,##0.00', CdsPlanoFac.FieldByName('total').AsFloat));
+    TxtFac.Add('--------------------------------');
+
+    TxtFac.SaveToFile(RutaArchivo);
+  finally
+    TxtFac.Free;
+  end;
+
+  ShellExecute(0, 'open', PChar(RutaArchivo), nil, nil, SW_SHOWNORMAL);
+end;
 procedure TCliente.BtnGenerarFacturaClick(Sender: TObject);
 var IdFactura: Integer;
 begin
@@ -512,6 +549,9 @@ begin
       raise Exception.Create('a numeración de la factura cambió. Por favor, vuelva a intentarlo.');
     end;
   end;
+  RESTRequest.Params.Items[0].Value := IdFactura.ToString;
+  RESTRequest.Execute;
+  GenerarFacturaPlano;
   BtnLimpiarFacturaClick(nil);
 end;
 
@@ -587,7 +627,7 @@ end;
 procedure TCliente.BtnAgregarDetalleClick(Sender: TObject);
 begin
 
- if SECantidad.Value > 0 then
+ if SECantidad.Value < 1 then
   begin
      MessageDlg('Por favor, ingrese una cantidad mayor a 0.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
      Exit;

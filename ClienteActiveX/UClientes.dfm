@@ -557,8 +557,8 @@ object Cliente: TCliente
   end
   object DsDetalleFactura: TDataSource
     DataSet = MTDetalleFactura
-    Left = 156
-    Top = 314
+    Left = 284
+    Top = 234
   end
   object MTDetalleFactura: TFDMemTable
     FetchOptions.AssignedValues = [evMode]
@@ -568,8 +568,8 @@ object Cliente: TCliente
     UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
     UpdateOptions.CheckRequired = False
     UpdateOptions.AutoCommitUpdates = True
-    Left = 156
-    Top = 370
+    Left = 284
+    Top = 290
     object MTDetalleFacturaPRODUCTO_ID: TIntegerField
       FieldName = 'PRODUCTO_ID'
     end
@@ -589,6 +589,97 @@ object Cliente: TCliente
     object MTDetalleFacturaNOMBRE_CLIENTE: TStringField
       FieldName = 'NOMBRE_CLIENTE'
       Size = 0
+    end
+  end
+  object RESTRequest: TRESTRequest
+    Client = RESTClient
+    Params = <
+      item
+        Kind = pkURLSEGMENT
+        Name = 'id'
+        Options = [poAutoCreated]
+        Value = '1'
+      end>
+    Resource = 'api/facturas/{id}'
+    Response = RESTResponse
+    SynchronizedEvents = False
+    Left = 92
+    Top = 202
+  end
+  object RESTResponse: TRESTResponse
+    ContentType = 'application/json'
+    Left = 92
+    Top = 258
+  end
+  object RESTResponseDataSetAdapter: TRESTResponseDataSetAdapter
+    Active = True
+    Dataset = CdsPlanoFac
+    FieldDefs = <>
+    Response = RESTResponse
+    Left = 92
+    Top = 314
+  end
+  object RESTClient: TRESTClient
+    Accept = 'application/json, text/plain;q=0.9, text/html;q=0.8'
+    AcceptCharset = 'utf-8, *;q=0.8'
+    BaseURL = 'https://localhost:55437'
+    Params = <>
+    SynchronizedEvents = False
+    Left = 92
+    Top = 138
+  end
+  object CdsPlanoFac: TClientDataSet
+    PersistDataPacket.Data = {
+      C60000009619E0BD0100000018000000040001000000030000008800066E756D
+      65726F02004A000000010005574944544802000200FE0105666563686102004A
+      000000010005574944544802000200FE010A636C69656E74655F496402004A00
+      0000010005574944544802000200FE0105746F74616C02004A00000001000557
+      4944544802000200FE010000000002003100260032003000320035002D003000
+      32002D00300032005400300030003A00300030003A0030003000020031000A00
+      32003500300030003000}
+    Active = True
+    Aggregates = <>
+    FieldDefs = <
+      item
+        Name = 'numero'
+        DataType = ftWideString
+        Size = 255
+      end
+      item
+        Name = 'fecha'
+        DataType = ftWideString
+        Size = 255
+      end
+      item
+        Name = 'cliente_Id'
+        DataType = ftWideString
+        Size = 255
+      end
+      item
+        Name = 'total'
+        DataType = ftWideString
+        Size = 255
+      end>
+    IndexDefs = <>
+    Params = <>
+    StoreDefs = True
+    Left = 92
+    Top = 370
+    object CdsPlanoFacnumero: TWideStringField
+      FieldName = 'numero'
+      Size = 255
+    end
+    object CdsPlanoFacfecha: TWideStringField
+      FieldName = 'fecha'
+      Size = 255
+    end
+    object CdsPlanoFaccliente_Id: TWideStringField
+      FieldName = 'cliente_Id'
+      Size = 255
+    end
+    object CdsPlanoFactotal: TWideStringField
+      FieldName = 'total'
+      Size = 255
     end
   end
 end

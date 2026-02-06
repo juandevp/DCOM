@@ -12,7 +12,7 @@ unit ServidorDCOM_TLB;
 // ************************************************************************ //
 
 // $Rev: 122765 $
-// File generated on 5/02/2026 11:55:04 p. m. from Type Library described below.
+// File generated on 6/02/2026 12:03:56 a. m. from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: D:\DigitalWare\Entregables\Servidor\ServidorDCOM (1)
