@@ -9,7 +9,10 @@ uses
   Vcl.Forms, Vcl.Dialogs, Winapi.ActiveX, Vcl.AxCtrls, ActiveClientes_TLB, StdVcl,
   Data.DB, Datasnap.DBClient, Datasnap.Win.MConnect, Vcl.Grids, Vcl.DBGrids,
   Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Buttons, Vcl.DBCtrls, Vcl.StdCtrls,Vcl.recerror,
-  Vcl.Mask, System.UITypes,UComun;
+  Vcl.Mask, System.UITypes,UComun, Vcl.Samples.Spin, System.Variants,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client;
 type
   TCliente = class(TActiveForm, ICliente)
     DCOMConnection: TDCOMConnection;
@@ -50,6 +53,27 @@ type
     CdsProductosPRODUCTO: TAutoIncField;
     CdsProductosNOMBRE_PRODUCTO: TStringField;
     CdsProductosVALOR: TFMTBCDField;
+    TbFacturar: TTabSheet;
+    Label1: TLabel;
+    Label4: TLabel;
+    DBGrid1: TDBGrid;
+    DsDetalleFactura: TDataSource;
+    DBLCBCliente: TDBLookupComboBox;
+    DBLCBProducto: TDBLookupComboBox;
+    Label5: TLabel;
+    SECantidad: TSpinEdit;
+    Label6: TLabel;
+    BtnAgregarDetalle: TButton;
+    BtnGenerarFactura: TButton;
+    LimpiarFactura: TButton;
+    DBNavigator1: TDBNavigator;
+    MTDetalleFactura: TFDMemTable;
+    MTDetalleFacturaNOMBRE_PRODUCTO: TStringField;
+    MTDetalleFacturaCLIENTE_ID: TIntegerField;
+    MTDetalleFacturaCANTIDAD: TIntegerField;
+    MTDetalleFacturaPRODUCTO_ID: TIntegerField;
+    MTDetalleFacturaNOMBRE_CLIENTE: TStringField;
+    MTDetalleFacturaVALOR: TBCDField;
     procedure ActiveFormCreate(Sender: TObject);
     procedure CdsClientesReconcileError(DataSet: TCustomClientDataSet;
       E: EReconcileError; UpdateKind: TUpdateKind;
@@ -58,6 +82,9 @@ type
     procedure BtnAgregarClick(Sender: TObject);
     procedure EdtFiltrarChange(Sender: TObject);
     procedure BtnActualizarClick(Sender: TObject);
+    procedure BtnAgregarDetalleClick(Sender: TObject);
+    procedure LimpiarFacturaClick(Sender: TObject);
+    procedure pcGeneralChange(Sender: TObject);
   private
     { Private declarations }
     FEvents: IClienteEvents;
@@ -474,6 +501,12 @@ procedure TCliente.BtnAgregarClick(Sender: TObject);
 var
   Resultado: Integer;
 begin
+  if CdsProductosVALOR.Value < 1 then
+  begin
+    MessageDlg('Por favor, ingrese un valor de producto mayor a 0.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+    Exit;
+  end;
+
   CambiarEstadoBotonesCliente(ECrear);
   try
     if (Trim(DbEdtNombres.Text)='') or  (Trim(DbEdtDireccion.Text)='')  then
@@ -501,6 +534,25 @@ begin
       CambiarEstadoBotonesCliente(ENada);
     end;
   end;
+end;
+
+procedure TCliente.BtnAgregarDetalleClick(Sender: TObject);
+begin
+ if (Trim(DbEdtNombres.Text)='') or  (Trim(DbEdtDireccion.Text)='')  then
+  begin
+     MessageDlg('Por favor, ingrese una cantidad mayor a 0.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+     Exit;
+  end;
+
+  MTDetalleFactura.Insert;
+  MTDetalleFacturaNOMBRE_PRODUCTO.AsString := CdsClientesNOMBRE_CLIENTE.AsString;
+  MTDetalleFacturaCLIENTE_ID.AsInteger := CdsClientesCLIENTE.AsInteger;
+  MTDetalleFacturaCANTIDAD.AsInteger := SECantidad.Value;
+  MTDetalleFacturaNOMBRE_PRODUCTO.AsString := CdsProductosNOMBRE_PRODUCTO.AsString;
+  MTDetalleFacturaPRODUCTO_ID.AsInteger := CdsProductosPRODUCTO.AsInteger;
+  MTDetalleFacturaVALOR.AsBCD := (MTDetalleFacturaCANTIDAD.AsInteger * CdsProductosVALOR.AsBCD);
+
+  MTDetalleFactura.Post;
 end;
 
 procedure TCliente.ClickEvent(Sender: TObject);
@@ -537,6 +589,14 @@ begin
   Key := Char(TempKey);
 end;
 
+procedure TCliente.LimpiarFacturaClick(Sender: TObject);
+begin
+  DBLCBCliente.KeyValue := Null;
+  DBLCBProducto.KeyValue := Null;
+  SECantidad.Value := 0;
+  MTDetalleFactura.EmptyDataSet;
+end;
+
 procedure TCliente.MouseEnterEvent(Sender: TObject);
 begin
   if FEvents <> nil then FEvents.OnMouseEnter;
@@ -550,6 +610,16 @@ end;
 procedure TCliente.PaintEvent(Sender: TObject);
 begin
   if FEvents <> nil then FEvents.OnPaint;
+end;
+
+procedure TCliente.pcGeneralChange(Sender: TObject);
+begin
+  MTDetalleFactura.Close;
+  if pcGeneral.ActivePage = TbFacturar then
+  begin
+     MTDetalleFactura.Open;
+     LimpiarFacturaClick(nil);
+  end;
 end;
 
 procedure TCliente.InicializarCOM;
