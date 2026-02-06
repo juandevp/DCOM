@@ -112,7 +112,7 @@ begin
       if QValidarFacturasCliente.FieldByName('TotalFac').AsInteger > 0 then
       begin
         FNovedades := 'No se puede eliminar el cliente porque '+
-          ' tiene m·s de una factura registrada.';
+          ' tiene m√°s de una factura registrada.';
       end
       else
       begin
@@ -182,7 +182,7 @@ begin
       if qVerificarFacturasProducto.FieldByName('TotalFac').AsInteger > 0 then
       begin
         FNovedades := 'No se puede eliminar el producto porque '+
-          ' tiene m·s de una factura registrada.';
+          ' tiene m√°s de una factura registrada.';
       end
       else
       begin
@@ -273,7 +273,7 @@ begin
    end
    else
    begin
-     InsertarDetalleFac(FIdFacura, AIdProducto, ACantidad, AValor);
+     InsertarDetalleFac(AIdFacura, AIdProducto, ACantidad, AValor);
      Result := 1;
    end;
 end;
