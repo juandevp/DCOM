@@ -12,7 +12,7 @@ unit ServidorDCOM_TLB;
 // ************************************************************************ //
 
 // $Rev: 122765 $
-// File generated on 6/02/2026 12:03:56 a. m. from Type Library described below.
+// File generated on 6/02/2026 1:14:21 a. m. from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: D:\DigitalWare\Entregables\Servidor\ServidorDCOM (1)
@@ -88,6 +88,7 @@ type
                       ATotalFactura: Double; AValor: Double; ACantidad: Integer): Integer; safecall;
     function Get_IdFactura: Integer; safecall;
     procedure Set_IdFactura(Value: Integer); safecall;
+    function EliminarFac(AIdFactura: Integer): Integer; safecall;
     property PEstado: WideString read Get_PEstado write Set_PEstado;
     property IdFactura: Integer read Get_IdFactura write Set_IdFactura;
   end;
@@ -110,6 +111,7 @@ type
     function Facturar(AIdFacura: Integer; AIdProducto: Integer; AIdCliente: Integer;
                       ATotalFactura: Double; AValor: Double; ACantidad: Integer): Integer; dispid 309;
     property IdFactura: Integer dispid 310;
+    function EliminarFac(AIdFactura: Integer): Integer; dispid 311;
     function AS_ApplyUpdates(const ProviderName: WideString; Delta: OleVariant; MaxErrors: SYSINT;
                              out ErrorCount: SYSINT; var OwnerData: OleVariant): OleVariant; dispid 20000000;
     function AS_GetRecords(const ProviderName: WideString; Count: SYSINT; out RecsOut: SYSINT;

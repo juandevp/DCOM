@@ -332,4 +332,25 @@ object Servidor: TServidor
       Required = True
     end
   end
+  object FDStoredProc: TFDStoredProc
+    Connection = Conn
+    SchemaName = 'dbo'
+    StoredProcName = 'DW.dbo.sp_eliminar_facs'
+    Left = 328
+    Top = 408
+    ParamData = <
+      item
+        Position = 1
+        Name = '@RETURN_VALUE'
+        DataType = ftInteger
+        ParamType = ptResult
+        Value = 0
+      end
+      item
+        Position = 2
+        Name = '@p1'
+        DataType = ftInteger
+        ParamType = ptInput
+      end>
+  end
 end

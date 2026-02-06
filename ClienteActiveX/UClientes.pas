@@ -528,31 +528,43 @@ end;
 procedure TCliente.BtnGenerarFacturaClick(Sender: TObject);
 var IdFactura: Integer;
 begin
+
   MTDetalleFactura.First;
   IdFactura := -1;
-  while not MTDetalleFactura.Eof do
-  begin
-    DCOMConnection.AppServer.Facturar(IdFactura, MTDetalleFacturaPRODUCTO_ID.AsInteger,
-      MTDetalleFacturaCLIENTE_ID.AsInteger, FTotalFactura, MTDetalleFacturaVALOR.AsCurrency, MTDetalleFacturaCANTIDAD.AsInteger);
-    MTDetalleFactura.Next;
-    if IdFactura = -1 then
+  try
+    while not MTDetalleFactura.Eof do
     begin
-      if DCOMConnection.AppServer.IdFactura > 1 then
+      DCOMConnection.AppServer.Facturar(IdFactura, MTDetalleFacturaPRODUCTO_ID.AsInteger,
+        MTDetalleFacturaCLIENTE_ID.AsInteger, FTotalFactura, MTDetalleFacturaVALOR.AsCurrency, MTDetalleFacturaCANTIDAD.AsInteger);
+      MTDetalleFactura.Next;
+      if IdFactura = -1 then
       begin
-        IdFactura := DCOMConnection.AppServer.IdFactura;
+        if DCOMConnection.AppServer.IdFactura > 1 then
+        begin
+          IdFactura := DCOMConnection.AppServer.IdFactura;
+        end
+        else
+          raise Exception.Create('Se detectaron inconsistencias en el consecutivo de la factura.');
       end
-      else
-        raise Exception.Create('Se detectaron inconsistencias en el consecutivo de la factura.');
-    end
-    else if (IdFactura <> DCOMConnection.AppServer.IdFactura) then
-    begin
-      raise Exception.Create('a numeración de la factura cambió. Por favor, vuelva a intentarlo.');
+      else if (IdFactura <> DCOMConnection.AppServer.IdFactura) then
+      begin
+         DCOMConnection.AppServer.EliminarFac(IdFactura);
+        raise Exception.Create('La numeración de la factura cambió. Por favor, vuelva a intentarlo.');
+      end;
     end;
+
+    RESTRequest.Params.Items[0].Value := IdFactura.ToString;
+    RESTRequest.Execute;
+    GenerarFacturaPlano;
+    BtnLimpiarFacturaClick(nil);
+   except
+     on E: Exception do
+     begin
+         DCOMConnection.AppServer.EliminarFac(IdFactura);
+         raise Exception.Create(E.Message);
+     end;
+
   end;
-  RESTRequest.Params.Items[0].Value := IdFactura.ToString;
-  RESTRequest.Execute;
-  GenerarFacturaPlano;
-  BtnLimpiarFacturaClick(nil);
 end;
 
 procedure TCliente.BtnActualizarClick(Sender: TObject);

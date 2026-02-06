@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 6/02/2026 12:03:58 a. m. (- $Rev: 12980 $, 88151171).
+// File generated on 6/02/2026 1:15:15 a. m. (- $Rev: 12980 $, 92428281).
 
 [
   uuid(B1F22042-8BC5-47E3-9CD3-D6FC4F11053A),
@@ -55,6 +55,8 @@ library ServidorDCOM
     HRESULT _stdcall IdFactura([out, retval] long* Value);
     [propput, id(0x00000136)]
     HRESULT _stdcall IdFactura([in] long Value);
+    [id(0x00000137)]
+    HRESULT _stdcall EliminarFac([in] long AIdFactura, [out, retval] long ASalida);
   };
 
   [

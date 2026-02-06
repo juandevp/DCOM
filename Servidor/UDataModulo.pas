@@ -39,6 +39,7 @@ type
     QInsertarDetalleFac: TFDQuery;
     qFacSec: TFDQuery;
     qFacSecNumFac: TIntegerField;
+    FDStoredProc: TFDStoredProc;
   private
     FNovedades: WideString;
     FIdFacura: Integer;
@@ -61,6 +62,7 @@ type
     procedure Set_IdFactura(Value: Integer); safecall;
     function Facturar(AIdFacura, AIdProducto, AIdCliente: Integer; ATotalFactura, AValor: Double;
           ACantidad: Integer): Integer; safecall;
+    function EliminarFac(AIdFactura: Integer): Integer; safecall;
 
 
 
@@ -245,7 +247,16 @@ begin
    else
    begin
      InsertarDetalleFac(FIdFacura, AIdProducto, ACantidad, AValor);
+     Result := 1;
    end;
+end;
+
+function TServidor.EliminarFac(AIdFactura: Integer): Integer;
+begin
+  Result := -1;
+  FDStoredProc.Params[1].AsInteger := AIdFactura;
+  FDStoredProc.ExecProc;
+  Result := 1;
 end;
 
 initialization
