@@ -35,7 +35,6 @@ object Cliente: TCliente
     Align = alClient
     TabOrder = 0
     OnChange = pcGeneralChange
-    ExplicitHeight = 480
     object TbsClientes: TTabSheet
       Caption = 'Clientes'
       object LblNombres: TLabel
@@ -107,7 +106,6 @@ object Cliente: TCliente
         VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbRefresh]
         Align = alBottom
         TabOrder = 1
-        ExplicitTop = 425
       end
       object BtnAgregar: TButton
         Left = 255
@@ -134,7 +132,6 @@ object Cliente: TCliente
         Height = 41
         Align = alBottom
         TabOrder = 4
-        ExplicitTop = 135
         object LblFiltro: TLabel
           Left = 112
           Top = 16
@@ -287,8 +284,6 @@ object Cliente: TCliente
         VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbRefresh]
         Align = alBottom
         TabOrder = 5
-        ExplicitLeft = -3
-        ExplicitTop = 440
       end
       object Panel1: TPanel
         Left = 0
@@ -297,7 +292,6 @@ object Cliente: TCliente
         Height = 41
         Align = alBottom
         TabOrder = 6
-        ExplicitTop = 143
         object Label3: TLabel
           Left = 112
           Top = 16
@@ -474,7 +468,6 @@ object Cliente: TCliente
         Caption = 'Generar factura'
         TabOrder = 5
         OnClick = BtnGenerarFacturaClick
-        ExplicitTop = 422
       end
       object BtnLimpiarFactura: TButton
         Left = 453
@@ -494,7 +487,6 @@ object Cliente: TCliente
         VisibleButtons = [nbPrior, nbNext, nbDelete]
         Align = alBottom
         TabOrder = 7
-        ExplicitTop = 385
       end
     end
   end

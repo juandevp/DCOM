@@ -495,10 +495,10 @@ begin
   IdFactura := -1;
   while not MTDetalleFactura.Eof do
   begin
-    ShowMessage( DCOMConnection.AppServer.Facturar(IdFactura, MTDetalleFacturaPRODUCTO_ID.AsInteger,
-      MTDetalleFacturaCLIENTE_ID.AsInteger, FTotalFactura, MTDetalleFacturaVALOR.AsCurrency, MTDetalleFacturaCANTIDAD.AsInteger));
+    DCOMConnection.AppServer.Facturar(IdFactura, MTDetalleFacturaPRODUCTO_ID.AsInteger,
+      MTDetalleFacturaCLIENTE_ID.AsInteger, FTotalFactura, MTDetalleFacturaVALOR.AsCurrency, MTDetalleFacturaCANTIDAD.AsInteger);
     MTDetalleFactura.Next;
-    if IdFactura <> -1 then
+    if IdFactura = -1 then
     begin
       if DCOMConnection.AppServer.IdFactura > 1 then
       begin
@@ -586,7 +586,8 @@ end;
 
 procedure TCliente.BtnAgregarDetalleClick(Sender: TObject);
 begin
- if (Trim(DbEdtNombres.Text)='') or  (Trim(DbEdtDireccion.Text)='')  then
+
+ if SECantidad.Value > 0 then
   begin
      MessageDlg('Por favor, ingrese una cantidad mayor a 0.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
      Exit;
