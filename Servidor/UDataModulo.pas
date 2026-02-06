@@ -56,8 +56,10 @@ type
     function CrearProducto(const ANombreProduc: WideString; AValor: Double): Integer;
           safecall;
     function EliminarProducto(AIdProduc: Integer): Integer; safecall;
-    procedure ActualizaCliente; safecall;
-    procedure ActualizarProducto; safecall;
+    function ActualizarCliente(AIdCliente: Integer; const ANombresCliente, ADireccionCliente: WideString): Integer;
+          safecall;
+    function ActualizarProducto(AIdProducto: Integer; const ANombreProducto: WideString;
+          AValor: Double): Integer; safecall;
     function Get_IdFactura: Integer; safecall;
     procedure Set_IdFactura(Value: Integer); safecall;
     function Facturar(AIdFacura, AIdProducto, AIdCliente: Integer; ATotalFactura, AValor: Double;
@@ -102,13 +104,13 @@ end;
 
 function TServidor.EliminarCliente(AIdCliente: Integer): Integer;
 begin
+ Result := -1;
   try
     QValidarFacturasCliente.ParamByName('CLIENTE').AsInteger := AIdCliente;
     QValidarFacturasCliente.Open;
     try
       if QValidarFacturasCliente.FieldByName('TotalFac').AsInteger > 0 then
       begin
-        Result := -1;
         FNovedades := 'No se puede eliminar el cliente porque '+
           ' tiene más de una factura registrada.';
       end
@@ -172,21 +174,21 @@ end;
 
 function TServidor.EliminarProducto(AIdProduc: Integer): Integer;
 begin
+  Result := -1;
   try
     qVerificarFacturasProducto.ParamByName('PRODUCTO').AsInteger := AIdProduc;
     qVerificarFacturasProducto.Open;
     try
-      if QValidarFacturasCliente.FieldByName('TotalFac').AsInteger > 0 then
+      if qVerificarFacturasProducto.FieldByName('TotalFac').AsInteger > 0 then
       begin
-        Result := -1;
         FNovedades := 'No se puede eliminar el producto porque '+
           ' tiene más de una factura registrada.';
       end
       else
       begin
-        QEliminarCliente.ParamByName('PRODUCTO').AsInteger := AIdProduc;
-        QEliminarCliente.ExecSQL;
-        FNovedades:= 'El prodcuto fue eliminado correctamente.';
+        QEliminarProductos.ParamByName('PRODUCTO').AsInteger := AIdProduc;
+        QEliminarProductos.ExecSQL;
+        FNovedades:= 'El producto fue eliminado correctamente.';
         Result := 1;
       end;
     finally
@@ -194,17 +196,42 @@ begin
     end;
     except
       on E: Exception do
-      FNovedades:= E.Message + '. producto eliminando cliente.';
+      FNovedades:= E.Message + '. Novedad eliminando producto.';
   end;
 end;
 
-procedure TServidor.ActualizaCliente;
+function TServidor.ActualizarCliente(AIdCliente: Integer; const ANombresCliente, ADireccionCliente: WideString): Integer;
+
 begin
+ Result := -1;
+  qActualizarCliente.ParamByName('NOMBRE_CLIENTE').AsString := ANombresCliente;
+  qActualizarCliente.ParamByName('DIRECCION').AsString := ADireccionCliente;
+  qActualizarCliente.ParamByName('CLIENTE').AsString := ADireccionCliente;
+  try
+    qActualizarCliente.ExecSQL;
+    Result := 1;
+    FNovedades:= 'El cliente fue actualizado correctamente.';
+  except
+    on E: Exception do
+    FNovedades:= E.Message + '. Novedad actualizando cliente.';
+  end;
 end;
 
-procedure TServidor.ActualizarProducto;
+function TServidor.ActualizarProducto(AIdProducto: Integer; const ANombreProducto: WideString;
+          AValor: Double): Integer;
 begin
-
+    Result := -1;
+  QActualizarProducto.ParamByName('NOMBRE_PRODUCTO').AsString := ANombreProducto;
+  QActualizarProducto.ParamByName('VALOR').AsBCD := AValor;
+  QActualizarProducto.ParamByName('PRODUCTO').AsInteger := AIdProducto;
+  try
+    QActualizarProducto.ExecSQL;
+    Result := 1;
+    FNovedades:= 'El producto fue acutalizado correctamente.';
+  except
+    on E: Exception do
+    FNovedades:= E.Message + '. Novedad actualizando producto.';
+  end;
 end;
 
 procedure TServidor.InsertarDetalleFac(AIdFacura, AIdProducto, ACantidad: Integer; AValor: Double);

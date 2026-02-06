@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 6/02/2026 1:15:15 a. m. (- $Rev: 12980 $, 92428281).
+// File generated on 6/02/2026 2:36:27 a. m. (- $Rev: 12980 $, 97300125).
 
 [
   uuid(B1F22042-8BC5-47E3-9CD3-D6FC4F11053A),
@@ -46,9 +46,9 @@ library ServidorDCOM
     [id(0x00000132)]
     HRESULT _stdcall EliminarProducto([in] long AIdProduc, [out, retval] long Salida);
     [id(0x00000133)]
-    HRESULT _stdcall ActualizaCliente(void);
+    HRESULT _stdcall ActualizarCliente([in] long AIdCliente, [in] BSTR ANombresCliente, [in] BSTR ADireccionCliente, [out, retval] long Salida);
     [id(0x00000134)]
-    HRESULT _stdcall ActualizarProducto(void);
+    HRESULT _stdcall ActualizarProducto([in] long AIdProducto, [in] BSTR ANombreProducto, [in] double AValor, [out, retval] long Salida);
     [id(0x00000135)]
     HRESULT _stdcall Facturar([in] long AIdFacura, [in] long AIdProducto, [in] long AIdCliente, [in] double ATotalFactura, [in] double AValor, [in] long ACantidad, [out, retval] long Salida);
     [propget, id(0x00000136)]

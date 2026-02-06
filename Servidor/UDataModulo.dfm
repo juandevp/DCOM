@@ -48,14 +48,14 @@ object Servidor: TServidor
     UpdateOptions.KeyFields = 'CLIENTE_ID'
     SQL.Strings = (
       
-        'SELECT COUNT(*) As TotalFac FROM PRODUCTOS P INNER JOIN DETALLE_' +
-        'FACTURA CF ON  CF.PRODUCTO_ID =  P.PRODUCTO WHERE P.PRODUCTO = :' +
-        'PRODUCTO')
+        'SELECT COUNT(*) As TotalFac FROM CLIENTES C INNER JOIN CABEZA_FA' +
+        'CTURA CF ON  CF.CLIENTE_ID =  C.CLIENTE WHERE C.CLIENTE = :CLIEN' +
+        'TE')
     Left = 184
-    Top = 208
+    Top = 200
     ParamData = <
       item
-        Name = 'PRODUCTO'
+        Name = 'CLIENTE'
         ParamType = ptInput
       end>
   end
@@ -219,7 +219,7 @@ object Servidor: TServidor
     DataSet = QProductos
     ResolveToDataSet = True
     Options = [poAutoRefresh, poUseQuoteChar]
-    Left = 432
+    Left = 424
     Top = 32
   end
   object qVerificarFacturasProducto: TFDQuery
@@ -229,18 +229,15 @@ object Servidor: TServidor
     UpdateOptions.KeyFields = 'CLIENTE_ID'
     SQL.Strings = (
       
-        'SELECT COUNT(*) As TotalFac FROM CLIENTES C INNER JOIN CABEZA_FA' +
-        'CTURA CF ON  CF.CLIENTE_ID =  C.CLIENTE WHERE C.CLIENTE = :CLIEN' +
-        'TE')
-    Left = 392
+        'SELECT COUNT(*) As TotalFac FROM PRODUCTOS P INNER JOIN DETALLE_' +
+        'FACTURA CF ON  CF.PRODUCTO_ID =  P.PRODUCTO WHERE P.PRODUCTO = :' +
+        'PRODUCTO')
+    Left = 376
     Top = 160
     ParamData = <
       item
-        Name = 'CLIENTE'
-        DataType = ftInteger
+        Name = 'PRODUCTO'
         ParamType = ptInput
-        Size = 1
-        Value = Null
       end>
   end
   object QInsertarCabezaFac: TFDQuery

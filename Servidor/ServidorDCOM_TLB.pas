@@ -12,7 +12,7 @@ unit ServidorDCOM_TLB;
 // ************************************************************************ //
 
 // $Rev: 122765 $
-// File generated on 6/02/2026 1:14:21 a. m. from Type Library described below.
+// File generated on 6/02/2026 2:32:50 a. m. from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: D:\DigitalWare\Entregables\Servidor\ServidorDCOM (1)
@@ -82,8 +82,10 @@ type
     function CrearCliente(const ANombresCliente: WideString; const ADireccion: WideString): Integer; safecall;
     function CrearProducto(const ANombreProduc: WideString; AValor: Double): Integer; safecall;
     function EliminarProducto(AIdProduc: Integer): Integer; safecall;
-    procedure ActualizaCliente; safecall;
-    procedure ActualizarProducto; safecall;
+    function ActualizarCliente(AIdCliente: Integer; const ANombresCliente: WideString;
+                               const ADireccionCliente: WideString): Integer; safecall;
+    function ActualizarProducto(AIdProducto: Integer; const ANombreProducto: WideString;
+                                AValor: Double): Integer; safecall;
     function Facturar(AIdFacura: Integer; AIdProducto: Integer; AIdCliente: Integer;
                       ATotalFactura: Double; AValor: Double; ACantidad: Integer): Integer; safecall;
     function Get_IdFactura: Integer; safecall;
@@ -106,8 +108,10 @@ type
     function CrearCliente(const ANombresCliente: WideString; const ADireccion: WideString): Integer; dispid 304;
     function CrearProducto(const ANombreProduc: WideString; AValor: Double): Integer; dispid 305;
     function EliminarProducto(AIdProduc: Integer): Integer; dispid 306;
-    procedure ActualizaCliente; dispid 307;
-    procedure ActualizarProducto; dispid 308;
+    function ActualizarCliente(AIdCliente: Integer; const ANombresCliente: WideString;
+                               const ADireccionCliente: WideString): Integer; dispid 307;
+    function ActualizarProducto(AIdProducto: Integer; const ANombreProducto: WideString;
+                                AValor: Double): Integer; dispid 308;
     function Facturar(AIdFacura: Integer; AIdProducto: Integer; AIdCliente: Integer;
                       ATotalFactura: Double; AValor: Double; ACantidad: Integer): Integer; dispid 309;
     property IdFactura: Integer dispid 310;

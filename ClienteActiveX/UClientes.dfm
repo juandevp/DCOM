@@ -31,7 +31,7 @@ object Cliente: TCliente
     Top = 0
     Width = 640
     Height = 506
-    ActivePage = TbFacturar
+    ActivePage = TbProductos
     Align = alClient
     TabOrder = 0
     OnChange = pcGeneralChange
@@ -157,6 +157,7 @@ object Cliente: TCliente
         DataField = 'NOMBRE_CLIENTE'
         DataSource = DsClientes
         TabOrder = 5
+        OnKeyPress = DbEdtNombresKeyPress
       end
       object DbEdtDireccion: TDBEdit
         Left = 288
@@ -176,6 +177,15 @@ object Cliente: TCliente
         Caption = 'Editar'
         TabOrder = 7
         OnClick = BtnActualizarClick
+      end
+      object BtnCancelar: TButton
+        Left = 417
+        Top = 98
+        Width = 75
+        Height = 25
+        Caption = 'Cancelar'
+        TabOrder = 8
+        OnClick = BtnCancelarClick
       end
     end
     object TbProductos: TTabSheet
@@ -209,6 +219,19 @@ object Cliente: TCliente
         Font.Style = [fsBold]
         ParentFont = False
       end
+      object LblINfo: TLabel
+        Left = 352
+        Top = 69
+        Width = 141
+        Height = 15
+        Caption = 'El valor no puede ser cero'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clRed
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold, fsItalic, fsUnderline]
+        ParentFont = False
+      end
       object BtnAgregarProduc: TButton
         Left = 257
         Top = 106
@@ -216,7 +239,7 @@ object Cliente: TCliente
         Height = 25
         Caption = 'Agregar'
         TabOrder = 0
-        OnClick = BtnAgregarClick
+        OnClick = BtnAgregarProducClick
       end
       object BtnEliminarProduc: TButton
         Left = 176
@@ -225,7 +248,7 @@ object Cliente: TCliente
         Height = 25
         Caption = 'Eliminar'
         TabOrder = 1
-        OnClick = BtnEliminarClick
+        OnClick = BtnEliminarProducClick
       end
       object DbProductosLista: TDBGrid
         Left = 0
@@ -262,9 +285,11 @@ object Cliente: TCliente
         Top = 40
         Width = 233
         Height = 23
+        CharCase = ecUpperCase
         DataField = 'NOMBRE_PRODUCTO'
         DataSource = DsProductos
         TabOrder = 3
+        OnKeyPress = DbEdtNombresKeyPress
       end
       object DBEdtPrecio: TDBEdit
         Left = 296
@@ -274,6 +299,7 @@ object Cliente: TCliente
         DataField = 'VALOR'
         DataSource = DsProductos
         TabOrder = 4
+        OnKeyPress = DBEdtPrecioKeyPress
       end
       object DBNavProduc: TDBNavigator
         Left = 0
@@ -305,7 +331,7 @@ object Cliente: TCliente
           Width = 273
           Height = 23
           TabOrder = 0
-          OnChange = EdtFiltrarChange
+          OnChange = EdtFiltrarProducChange
         end
       end
       object BtnActualizarProduc: TButton
@@ -316,6 +342,15 @@ object Cliente: TCliente
         Caption = 'Editar'
         TabOrder = 7
         OnClick = BtnActualizarProducClick
+      end
+      object BtnCancelarProduc: TButton
+        Left = 418
+        Top = 106
+        Width = 75
+        Height = 25
+        Caption = 'Cancelar'
+        TabOrder = 8
+        OnClick = BtnCancelarProducClick
       end
     end
     object TbFacturar: TTabSheet
@@ -429,6 +464,7 @@ object Cliente: TCliente
         ListField = 'NOMBRE_CLIENTE'
         ListSource = DsClientes
         TabOrder = 1
+        OnClick = DBLCBClienteClick
       end
       object DBLCBProducto: TDBLookupComboBox
         Left = 21

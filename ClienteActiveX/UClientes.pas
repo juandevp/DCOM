@@ -87,6 +87,9 @@ type
     CdsPlanoFacfecha: TWideStringField;
     CdsPlanoFaccliente_Id: TWideStringField;
     CdsPlanoFactotal: TWideStringField;
+    LblINfo: TLabel;
+    BtnCancelarProduc: TButton;
+    BtnCancelar: TButton;
     procedure ActiveFormCreate(Sender: TObject);
     procedure CdsClientesReconcileError(DataSet: TCustomClientDataSet;
       E: EReconcileError; UpdateKind: TUpdateKind;
@@ -101,6 +104,14 @@ type
     procedure BtnActualizarProducClick(Sender: TObject);
     procedure BtnGenerarFacturaClick(Sender: TObject);
     procedure GenerarFacturaPlano;
+    procedure DBEdtPrecioKeyPress(Sender: TObject; var Key: Char);
+    procedure DbEdtNombresKeyPress(Sender: TObject; var Key: Char);
+    procedure BtnAgregarProducClick(Sender: TObject);
+    procedure BtnEliminarProducClick(Sender: TObject);
+    procedure EdtFiltrarProducChange(Sender: TObject);
+    procedure DBLCBClienteClick(Sender: TObject);
+    procedure BtnCancelarProducClick(Sender: TObject);
+    procedure BtnCancelarClick(Sender: TObject);
   private
     { Private declarations }
     FEvents: IClienteEvents;
@@ -227,6 +238,18 @@ begin
   Filtro :='NOMBRE_CLIENTE LIKE '+ QuotedStr('%'+EdtFiltrar.Text+'%');
   CdsClientes.Filter := Filtro;
   CdsClientes.Filtered := True;
+end;
+
+procedure TCliente.EdtFiltrarProducChange(Sender: TObject);
+var
+  Filtro: string;
+begin
+  CdsProductos.Filtered := False;
+
+  if EdtFiltrarProduc.Text = '' then Exit;
+  Filtro :='NOMBRE_PRODUCTO LIKE '+ QuotedStr('%'+EdtFiltrarProduc.Text+'%');
+  CdsProductos.Filter := Filtro;
+  CdsProductos.Filtered := True;
 end;
 
 procedure TCliente.EventSinkChanged(const EventSink: IUnknown);
@@ -467,6 +490,8 @@ begin
   InicializarCOM;
   CargarDatosClientes;
   CargarDatosProductos;
+  CambiarEstadoBotonesCliente(ENada);
+  CambiarEstadoBotonesProductos(ENada);
 end;
 
 procedure TCliente.AfterMonitorDpiChangedEvent(Sender: TObject; OldDPI, NewDPI: Integer);
@@ -485,7 +510,7 @@ procedure TCliente.BtnEliminarClick(Sender: TObject);
 var
   Resultado: Integer;
 begin
-  CambiarEstadoBotonesProductos(EEliminar);
+  CambiarEstadoBotonesCliente(EEliminar);
   try
     if  MessageDlg('¿Está seguro de que desea eliminar este cliente?',
       TMsgDlgType.mtInformation, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrYes then
@@ -496,9 +521,29 @@ begin
       CargarDatosClientes;
     end;
   finally
+    CambiarEstadoBotonesCliente(ENada);
+  end;
+end;
+
+procedure TCliente.BtnEliminarProducClick(Sender: TObject);
+var
+  Resultado: Integer;
+begin
+  CambiarEstadoBotonesProductos(EEliminar);
+  try
+    if  MessageDlg('¿Está seguro de que desea eliminar este producto?',
+      TMsgDlgType.mtInformation, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrYes then
+    begin
+      Resultado := DCOMConnection.AppServer.
+        EliminarProducto(CdsProductosPRODUCTO.AsInteger);
+      DispararMensaje(DCOMConnection.AppServer.PEstado, Resultado);
+      CargarDatosProductos;
+    end;
+  finally
     CambiarEstadoBotonesProductos(ENada);
   end;
 end;
+
 procedure TCliente.GenerarFacturaPlano;
 var
   RutaArchivo: string;
@@ -568,8 +613,9 @@ begin
 end;
 
 procedure TCliente.BtnActualizarClick(Sender: TObject);
+var
+  Resultado: Integer;
 begin
-  BtnActualizar.Caption := 'Guardar';
   CambiarEstadoBotonesCliente(EActualizar);
   try
     if (Trim(DbEdtNombres.Text)='') or  (Trim(DbEdtDireccion.Text)='')  then
@@ -577,23 +623,56 @@ begin
        MessageDlg('Por favor, complete todos los campos obligatorios antes de guardar.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
        Exit;
     end;
+
+    if CdsClientes.State in [dsEdit] then
+    begin
+      Resultado := DCOMConnection.AppServer.
+        ActualizarCliente(CdsClientesCLIENTE.AsInteger,CdsClientesNOMBRE_CLIENTE.AsString,CdsClientesDIRECCION.AsString);
+      DispararMensaje(DCOMConnection.AppServer.PEstado, Resultado);
+      CargarDatosClientes;
+    end
+    else
+    begin
+      CdsClientes.Edit;
+    end;
   finally
-    CambiarEstadoBotonesCliente(ENada);
+    if CdsClientes.State in [dsBrowse] then
+    begin
+      CambiarEstadoBotonesCliente(ENada);
+    end;
   end;
 end;
 
 procedure TCliente.BtnActualizarProducClick(Sender: TObject);
+var
+  Resultado: Integer;
 begin
-  BtnActualizar.Caption := 'Guardar';
+   if (CdsProductosVALOR.Value < 1) or  (Trim(DBEdtNombreProducto.Text)='')   then
+  begin
+    MessageDlg('Por favor, ingrese un valor de producto mayor a 0 o ' +
+    'Nombre de producto', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+    Exit;
+  end;
+
   CambiarEstadoBotonesProductos(EActualizar);
   try
-    if (Trim(DbEdtNombres.Text)='') or  (Trim(DbEdtDireccion.Text)='')  then
+    if CdsProductos.State in [dsEdit] then
     begin
-       MessageDlg('Por favor, complete todos los campos obligatorios antes de guardar.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
-       Exit;
+      Resultado := DCOMConnection.AppServer.
+        ActualizarProducto(CdsProductosPRODUCTO.AsInteger,CdsProductosNOMBRE_PRODUCTO.AsString,
+          CdsProductosVALOR.AsCurrency);
+      DispararMensaje(DCOMConnection.AppServer.PEstado, Resultado);
+      CargarDatosProductos;
+    end
+    else
+    begin
+      CdsProductos.Edit;
     end;
   finally
-    CambiarEstadoBotonesProductos(ENada);
+    if CdsProductos.State in [dsBrowse] then
+    begin
+      CambiarEstadoBotonesProductos(ENada);
+    end;
   end;
 end;
 
@@ -601,13 +680,7 @@ procedure TCliente.BtnAgregarClick(Sender: TObject);
 var
   Resultado: Integer;
 begin
-  if CdsProductosVALOR.Value < 1 then
-  begin
-    MessageDlg('Por favor, ingrese un valor de producto mayor a 0.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
-    Exit;
-  end;
-
-  CambiarEstadoBotonesProductos(ECrear);
+  CambiarEstadoBotonesCliente(ECrear);
   try
     if (Trim(DbEdtNombres.Text)='') or  (Trim(DbEdtDireccion.Text)='')  then
     begin
@@ -617,7 +690,6 @@ begin
 
     if CdsClientes.State in [dsInsert] then
     begin
-      BtnAgregar.Caption := 'Crear';
       Resultado := DCOMConnection.AppServer.
         CrearCliente(CdsClientesNOMBRE_CLIENTE.AsString,CdsClientesDIRECCION.AsString);
       DispararMensaje(DCOMConnection.AppServer.PEstado, Resultado);
@@ -626,12 +698,11 @@ begin
     else
     begin
       CdsClientes.Insert;
-      BtnAgregar.Caption := 'Guardar';
     end;
   finally
     if CdsClientes.State in [dsBrowse] then
     begin
-      CambiarEstadoBotonesProductos(ENada);
+      CambiarEstadoBotonesCliente(ENada);
     end;
   end;
 end;
@@ -659,6 +730,51 @@ begin
   SECantidad.Value := 0;
 end;
 
+procedure TCliente.BtnAgregarProducClick(Sender: TObject);
+var
+  Resultado: Integer;
+begin
+   if (CdsProductosVALOR.Value < 1) or  (Trim(DBEdtNombreProducto.Text)='')   then
+  begin
+    MessageDlg('Por favor, ingrese un valor de producto mayor a 0 o ' +
+    'Nombre de producto', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+    Exit;
+  end;
+
+  CambiarEstadoBotonesProductos(ECrear);
+  try
+    if CdsProductos.State in [dsInsert] then
+    begin
+      Resultado := DCOMConnection.AppServer.
+        CrearProducto(CdsProductosNOMBRE_PRODUCTO.AsString,
+          CdsProductosVALOR.AsCurrency);
+      DispararMensaje(DCOMConnection.AppServer.PEstado, Resultado);
+      CargarDatosProductos;
+    end
+    else
+    begin
+      CdsProductos.Insert;
+    end;
+  finally
+    if CdsProductos.State in [dsBrowse] then
+    begin
+      CambiarEstadoBotonesProductos(ENada);
+    end;
+  end;
+end;
+
+procedure TCliente.BtnCancelarClick(Sender: TObject);
+begin
+  CambiarEstadoBotonesCliente(ENada);
+  CdsClientes.Cancel;
+end;
+
+procedure TCliente.BtnCancelarProducClick(Sender: TObject);
+begin
+ CambiarEstadoBotonesProductos(ENada);
+ CdsProductos.Cancel;
+end;
+
 procedure TCliente.ClickEvent(Sender: TObject);
 begin
   if FEvents <> nil then FEvents.OnClick;
@@ -667,6 +783,29 @@ end;
 procedure TCliente.CreateEvent(Sender: TObject);
 begin
   if FEvents <> nil then FEvents.OnCreate;
+end;
+
+procedure TCliente.DbEdtNombresKeyPress(Sender: TObject; var Key: Char);
+begin
+
+  if not ((CharInSet(Key, ['A'..'Z'])) or
+    (CharInSet(Key, ['a'..'z'])) or
+    (CharInSet(Key, ['á','é','í','ó','ú','Á','É','Í','Ó','Ú','ñ','Ñ',' '])) or
+    (CharInSet(Key,[#8]))) then
+      Key := #0;
+end;
+
+procedure TCliente.DBEdtPrecioKeyPress(Sender: TObject; var Key: Char);
+begin
+  if not (CharInSet(Key,['0'..'9', #8])) then
+    Key := #0;
+end;
+
+procedure TCliente.DBLCBClienteClick(Sender: TObject);
+begin
+  DBLCBCliente.Enabled := False;
+  TbsClientes.Enabled := False;
+  TbProductos.Enabled := False;
 end;
 
 procedure TCliente.DblClickEvent(Sender: TObject);
@@ -701,6 +840,9 @@ begin
   MTDetalleFactura.EmptyDataSet;
   LBlTotalFactura.Caption := '0';
   FTotalFactura := 0;
+  DBLCBCliente.Enabled := True;
+  TbsClientes.Enabled := True;
+  TbProductos.Enabled := True;
 end;
 
 procedure TCliente.MouseEnterEvent(Sender: TObject);
@@ -752,8 +894,30 @@ begin
     or (AEstado = EnumEstadoForm.ENada);
   BtnActualizarProduc.Enabled := (AEstado = EnumEstadoForm.EActualizar)
     or (AEstado = EnumEstadoForm.ENada);
+
+  if BtnAgregarProduc.Enabled and (AEstado = EnumEstadoForm.ECrear) then
+  begin
+    BtnAgregarProduc.Caption := 'Guardar';
+  end
+  else if BtnAgregarProduc.Enabled and (AEstado = EnumEstadoForm.ENada) then
+  begin
+    BtnAgregarProduc.Caption := 'Agregar';
+  end;
+
+
+  if BtnActualizarProduc.Enabled  and (AEstado = EnumEstadoForm.EActualizar) then
+  begin
+    BtnActualizarProduc.Caption := 'Guardar';
+  end
+  else if BtnActualizarProduc.Enabled  and (AEstado = EnumEstadoForm.ENada)  then
+  begin
+    BtnActualizarProduc.Caption := 'Editar';
+  end;
   DBNavProduc.Enabled := (AEstado = EnumEstadoForm.ENada);
   DbProductosLista.Enabled := (AEstado = EnumEstadoForm.ENada);
+  DBEdtNombreProducto.Enabled := not (AEstado = EnumEstadoForm.ENada);
+  DBEdtPrecio.Enabled := not (AEstado = EnumEstadoForm.ENada);
+  BtnCancelarProduc.Enabled := not (AEstado = EnumEstadoForm.ENada)
 end;
 
 procedure TCliente.CambiarEstadoBotonesCliente(AEstado: EnumEstadoForm);
@@ -764,8 +928,31 @@ begin
     or (AEstado = EnumEstadoForm.ENada);
   BtnActualizar.Enabled := (AEstado = EnumEstadoForm.EActualizar)
     or (AEstado = EnumEstadoForm.ENada);
+
+  if BtnAgregar.Enabled and (AEstado = EnumEstadoForm.ECrear) then
+  begin
+    BtnAgregar.Caption := 'Guardar';
+  end
+  else if BtnAgregar.Enabled and (AEstado = EnumEstadoForm.ENada) then
+  begin
+    BtnAgregar.Caption := 'Agregar';
+  end;
+
+
+  if BtnActualizar.Enabled  and (AEstado = EnumEstadoForm.EActualizar) then
+  begin
+    BtnActualizar.Caption := 'Guardar';
+  end
+  else if BtnActualizar.Enabled  and (AEstado = EnumEstadoForm.ENada)  then
+  begin
+    BtnActualizar.Caption := 'Editar';
+  end;
+
   DBNavCliente.Enabled := (AEstado = EnumEstadoForm.ENada);
   DbClientesLista.Enabled := (AEstado = EnumEstadoForm.ENada);
+  DbEdtNombres.Enabled := not (AEstado = EnumEstadoForm.ENada);
+  DbEdtDireccion.Enabled := not (AEstado = EnumEstadoForm.ENada);
+  BtnCancelar.Enabled := not (AEstado = EnumEstadoForm.ENada);
 end;
 
 procedure TCliente.DispararMensaje(AMensaje: string; ATipoNovedad: Integer);
